@@ -1,0 +1,28 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Calendar	helloruby.rb	/^module Calendar$/;"	m
+accumlator	helloruby.rb	/^def accumlator$/;"	f
+cal	helloruby.rb	/^	def cal(year, month)$/;"	f	class:Calendar
+count_words	helloruby.rb	/^def count_words(file_path)$/;"	f
+counter	helloruby.rb	/^def counter$/;"	f
+du	helloruby.rb	/^def du(path)$/;"	f
+get_local_and_domain	helloruby.rb	/^def get_local_and_domain(str)$/;"	f
+jparsedate	helloruby.rb	/^def jparsedate(str)$/;"	f
+kan2num	helloruby.rb	/^def kan2num(string)$/;"	f
+ls_t	helloruby.rb	/^def ls_t(path)$/;"	f
+my_collect	helloruby.rb	/^def my_collect(obj, &block)$/;"	f
+print_libraries	helloruby.rb	/^def print_libraries$/;"	f
+process_file	helloruby.rb	/^def process_file(path)$/;"	f
+reverse	helloruby.rb	/^def reverse(input)$/;"	f
+simple_grep	grep.rb	/^def simple_grep(pattern, filename)$/;"	f
+str2hash	helloruby.rb	/^def str2hash(str)$/;"	f
+tail	helloruby.rb	/^def tail(lines, file)$/;"	f
+to_utf8	helloruby.rb	/^def to_utf8(str_euc, str_sjis)$/;"	f
+total2	helloruby.rb	/^def total2(from, to, &block)$/;"	f
+traverse	helloruby.rb	/^def traverse(path)$/;"	f
+wc	helloruby.rb	/^def wc(file)$/;"	f
+word_capitalize	helloruby.rb	/^def word_capitalize(str)$/;"	f
