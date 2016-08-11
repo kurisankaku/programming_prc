@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  vars:
+    roles:
+      - common
+    types:
+      [ 'tasks', 'handlers', 'templates', 'files', 'vars', 'meta' ]
+  tasks:
+    - name: create site yml
+      file: path=site.yml state=touch
+    - name: create vars directories
+      file: path={{ item }} state=directory
+      with_items:
+        - group_vars
+        - host_vars
+    - name: create role directories
+      file: path=roles/{{ item[0] }}/{{ item[1] }} state=directory
+      with_nested:
+        - '{{ roles }}'
+        - '{{ types }}'
+    - name: create main files
+      file: path=roles/{{ item[0] }}/{{ item[1] }}/{{ item[2] }} state=touch
+      with_nested:
+        - '{{ roles }}'
+        - '{{ types }}'
+        - main.yml
