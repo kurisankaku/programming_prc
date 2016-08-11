@@ -1,0 +1,13 @@
+---
+#- name: update yum
+#  become: yes
+#  yum: name=* state=latest
+#
+#- name: install latest git module
+#  become: yes
+#  yum: name=git state=latest
+
+- name: checkout dotfiles from github
+  git: repo=git@github.com:kurisankaku/dotfiles.git
+       accept_hostkey=yes
+       dest=~/dotfiles
