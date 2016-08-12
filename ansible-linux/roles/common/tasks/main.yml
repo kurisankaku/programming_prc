@@ -1,15 +1,10 @@
 ---
+- name: create bash_profile if not exist
+  file: path=~/.bash_profile state=touch
+
 - name: set ls color
   blockinfile:
     dest: ~/.bash_profile
     block: |
       alias ls='ls -G'
       export LSCOLORS=gxfxcxdxbxegedabagacad
-#
-# - name: update yum
-#   become: yes
-#   yum: name=* state=latest
-#
-# - name: install latest git module
-#   become: yes
-#   yum: name=git state=latest
