@@ -1,13 +1,15 @@
 ---
-#- name: update yum
-#  become: yes
-#  yum: name=* state=latest
+- name: set ls color
+  blockinfile:
+    dest: ~/.bash_profile
+    block: |
+      alias ls='ls -G'
+      export LSCOLORS=gxfxcxdxbxegedabagacad
 #
-#- name: install latest git module
-#  become: yes
-#  yum: name=git state=latest
-
-- name: checkout dotfiles from github
-  git: repo=git@github.com:kurisankaku/dotfiles.git
-       accept_hostkey=yes
-       dest=~/dotfiles
+# - name: update yum
+#   become: yes
+#   yum: name=* state=latest
+#
+# - name: install latest git module
+#   become: yes
+#   yum: name=git state=latest

@@ -1,3 +1,14 @@
+# ansible-directories.yml
+# # Create directories for ansible playbooks.
+# #
+# # Example Usage:
+# # Create a single role.
+# # $ ansible-playbook --extra-vars 'roles=some-role' ansible-directories.yml
+# # or
+# # Create multiple roles.
+# # $ ansible-playbook \
+# #      --extra-vars '{"roles":["common", "webservers", "dbservers"]}' \
+# #      ansible-directories.yml
 ---
 - hosts: localhost
   gather_facts: no
