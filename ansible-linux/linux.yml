@@ -1,5 +1,0 @@
----
-- hosts: host
-  roles:
-    - common
-    - linux
