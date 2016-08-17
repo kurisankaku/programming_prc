@@ -3,8 +3,13 @@
   file: path=~/.bash_profile state=touch
 
 - name: set ls color
-  blockinfile:
+  lineinfile:
     dest: ~/.bash_profile
-    block: |
-      alias ls='ls -G'
-      export LSCOLORS=gxfxcxdxbxegedabagacad
+    state: present
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: "^alias ls='ls -G'"
+      line: "alias ls='ls -G'"
+    - regexp: "^export LSCOLORS=gxfxcxdxbxegedabagacad"
+      line: "export LSCOLORS=gxfxcxdxbxegedabagacad"

@@ -4,11 +4,5 @@
        accept_hostkey=yes
        dest=~/dotfiles
 
-- name: create symbolic link to _vimrc
-  file: src=~/dotfiles/_vimrc dest=~/.vimrc state=link
-
-- name: create bundle directory
-  file: path=~/.vim/bundle state=directory
-
-- name: create symbolic link to neobundle
-  file: src=~/dotfiles/.vim/bundle/neobundle.vim dest=~/.vim/bundle/neobundle.vim state=link
+- include: vim.yml
+- include: node.yml
