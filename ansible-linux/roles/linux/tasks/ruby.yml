@@ -1,0 +1,56 @@
+---
+- name: install rbenv
+  git:
+    repo: "https://github.com/sstephenson/rbenv.git"
+    dest: ~/.rbenv
+
+- name: compile dynamic bash extension to speed up rbenv
+  shell: "cd ~/.rbenv && src/configure && make -C src"
+
+- name: update bash_profile for rbenv
+  lineinfile:
+    dest: ~/.bash_profile
+    state: present
+    regexp: "{{item.regexp}}"
+    line: "{{item.line}}"
+  with_items:
+    - regexp: "^export PATH=\\$HOME/.rbenv/bin:\\$PATH$"
+      line: "export PATH=$HOME/.rbenv/bin:$PATH"
+    - regexp: '^eval \"\$\(rbenv init -\)\"$'
+      line: 'eval "$(rbenv init -)"'
+
+- name: install dependencies for ruby-build
+  yum:
+    name: "{{item.name}}"
+    state: latest
+  become: yes
+  with_items:
+    - name: gcc
+    - name: bzip2
+    - name: openssl-devel
+    - name: libyaml-devel
+    - name: libffi-devel
+    - name: readline-devel
+    - name: zlib-devel
+    - name: gdbm-devel
+    - name: ncurses-devel
+
+- name: install ruby-build
+  git:
+    repo: "https://github.com/sstephenson/ruby-build.git"
+    dest: ~/.rbenv/plugins/ruby-build
+
+- name: check ruby version already exists.
+  shell: /bin/bash -lc "rbenv versions | grep {{ruby_version}}"
+  register: is_exists_ruby
+  ignore_errors: yes
+
+- name: install ruby
+  shell: /bin/bash -lc "rbenv install {{ruby_version}}"
+  when: is_exists_ruby|failed
+
+- name: set default ruby version
+  shell: /bin/bash -lc "rbenv global {{ruby_version}}"
+
+- name: rehash ruby
+  shell: /bin/bash -lc "rbenv rehash"

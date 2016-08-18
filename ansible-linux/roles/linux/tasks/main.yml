@@ -3,6 +3,6 @@
   become: yes
   yum: name=* state=latest
 
-- name: install latest git module
-  become: yes
-  yum: name=git state=latest
+- include: git.yml
+- include: nginx.yml
+- include: ruby.yml

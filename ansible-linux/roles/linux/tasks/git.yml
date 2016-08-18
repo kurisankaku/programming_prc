@@ -1,0 +1,4 @@
+---
+- name: install latest git module
+  become: yes
+  yum: name=git state=latest

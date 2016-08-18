@@ -1,0 +1,4 @@
+---
+- name: install latest nginx module
+  become: yes
+  yum: name=nginx state=latest
