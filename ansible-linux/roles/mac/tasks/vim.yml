@@ -1,4 +1,9 @@
 ---
+- name: checkout dotfiles from github
+  git: repo=git@github.com:kurisankaku/dotfiles.git
+       accept_hostkey=yes
+       dest=~/dotfiles
+
 - name: create symbolic link to _vimrc
   file: src=~/dotfiles/_vimrc dest=~/.vimrc state=link
 

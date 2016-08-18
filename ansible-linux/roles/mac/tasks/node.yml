@@ -15,9 +15,6 @@
     regexp: "^export PATH=\\$HOME/.nodebrew/current/bin:\\$PATH$"
     line: "export PATH=$HOME/.nodebrew/current/bin:$PATH"
 
-# - name: create .nodebrew directory
-#   file: path=~/.nodebrew state=directory
-
 - name: install latest node.js
   shell: /bin/bash -lc "nodebrew install-binary latest"
   ignore_errors: true
