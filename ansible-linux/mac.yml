@@ -1,6 +1,0 @@
----
-- hosts: host
-  connection: local
-  roles:
-    - common
-    - mac

@@ -1,0 +1,26 @@
+---
+- name: check nodebrew is install
+  shell: type nodebrew
+  register: is_nodebrew
+  ignore_errors: true
+
+- name: install nodebrew if node doesnt exist
+  shell: "curl -L git.io/nodebrew | perl - setup"
+  when: is_nodebrew|failed
+
+- name: update bash_profile for nodebrew
+  lineinfile:
+    dest: ~/.bash_profile
+    state: present
+    regexp: "^export PATH=\\$HOME/.nodebrew/current/bin:\\$PATH$"
+    line: "export PATH=$HOME/.nodebrew/current/bin:$PATH"
+
+# - name: create .nodebrew directory
+#   file: path=~/.nodebrew state=directory
+
+- name: install latest node.js
+  shell: /bin/bash -lc "nodebrew install-binary latest"
+  ignore_errors: true
+
+- name: use latest node.js
+  shell: /bin/bash -lc "nodebrew use latest"
