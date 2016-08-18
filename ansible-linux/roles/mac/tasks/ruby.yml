@@ -1,0 +1,37 @@
+---
+- name: install rbenv
+  homebrew:
+    name: rbenv
+    state: latest
+
+- name: update bash_profile for rbenv
+  lineinfile:
+    dest: ~/.bash_profile
+    state: present
+    regexp: "{{item.regexp}}"
+    line: "{{item.line}}"
+  with_items:
+    - regexp: "^export PATH=\\$HOME/.rbenv/bin:\\$PATH$"
+      line: "export PATH=$HOME/.rbenv/bin:$PATH"
+    - regexp: '^eval \"\$\(rbenv init -\)\"$'
+      line: 'eval "$(rbenv init -)"'
+
+- name: install ruby-build
+  homebrew:
+    name: ruby-build
+    state: latest
+
+- name: check ruby version already exists.
+  shell: /bin/bash -lc "rbenv versions | grep {{ruby_version}}"
+  register: is_exists_ruby
+  ignore_errors: yes
+
+- name: install ruby
+  shell: /bin/bash -lc "rbenv install {{ruby_version}}"
+  when: is_exists_ruby|failed
+
+- name: set default ruby version
+  shell: /bin/bash -lc "rbenv global {{ruby_version}}"
+
+- name: rehash ruby
+  shell: /bin/bash -lc "rbenv rehash"
