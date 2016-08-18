@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+    <template id="template">
+      <div id="container">
+        <img src="http://webcomponents.org/img/logo.svg">
+        <content select="h1"></content>
+      </div>
+    </template>
+    <div id="host">
+      <h1>This is Shadow DOM</h1>
+    </div>
+    <script type="text/javascript">
+      var host = document.querySelector("#host");
+      var root = host.createShadowRoot();
+      var template = document.querySelector("#template");
+      var clone = document.importNode(template.content, true);
+      root.appendChild(clone);
+    </script>
+  </body>
+</html>

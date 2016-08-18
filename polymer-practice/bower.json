@@ -1,0 +1,20 @@
+{
+  "name": "polymer-practice",
+  "homepage": "https://github.com/kurisankaku/programming_prc",
+  "authors": [
+    "Kuriyama Munehisa <kurisankaku@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.0"
+  }
+}

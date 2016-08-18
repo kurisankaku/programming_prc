@@ -1,0 +1,34 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<dom-module id="style-example">
+  <template>
+    <style>
+      button {
+        display: inline-block;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        cursor: pointer;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+      }
+      button:hover{
+        color: #333;
+        background-color: #e6e6e6;
+        border-color: #adadad;
+      }
+      button:active{
+        border:1px solid #334c66;
+        box-shadow:inset 0px 0px 2px #3a6da0;
+      }
+    </style>
+    <button id="button1">Style Example</button>
+  </template>
+  <script>
+    Polymer({
+      is: "style-example"
+    });
+  </script>
+</dom-module>
