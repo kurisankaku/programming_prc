@@ -4,5 +4,6 @@
   yum: name=* state=latest
 
 - include: git.yml
-- include: nginx.yml
 - include: ruby.yml
+- include: unicorn.yml
+- include: nginx.yml

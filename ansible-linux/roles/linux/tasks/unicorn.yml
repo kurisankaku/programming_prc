@@ -1,0 +1,3 @@
+---
+- name: install unicorn
+  gem: name=unicorn version=5.1.0 state=present

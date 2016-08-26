@@ -2,3 +2,9 @@
 - name: install latest nginx module
   become: yes
   yum: name=nginx state=latest
+
+- name: set auto start nginx
+  shell: systemctl enable nginx.service
+
+- name: start nginx
+  shell: systemctl start nginx.service
