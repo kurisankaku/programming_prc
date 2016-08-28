@@ -9,7 +9,7 @@
 
 - name: Define mysql_daemon.
   set_fact:
-    mysql_daemon: "{{__mysql_daemon | list}}"
+    mysql_daemon: "{{ __mysql_daemon }}"
   when: mysql_daemon is not defined
 
 - name: Define mysql_slow_query_log_file.

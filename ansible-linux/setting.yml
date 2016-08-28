@@ -1,6 +1,6 @@
 ---
 - hosts: host
   roles:
-    - { role: common }
+    # - { role: common }
     - { role: linux, when: "ansible_os_family == 'RedHat'" }
     - { role: mac, when: "ansible_os_family == 'Darwin'" }

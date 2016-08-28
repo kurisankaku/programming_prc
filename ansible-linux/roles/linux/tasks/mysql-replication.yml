@@ -2,7 +2,7 @@
 - name: Ensure replication user exists on master.
   mysql_user:
     name: "{{ mysql_replication_user.name }}"
-    host: "{{ mysql_replication_user.host | default('%')" }}
+    host: "{{ mysql_replication_user.host | default('%') }}"
     password: "{{ mysql_replication_user.password }}"
     priv: "{{ mysql_replication_user.priv | default('*.*:REPLICATION SLAVE') }}"
     state: present

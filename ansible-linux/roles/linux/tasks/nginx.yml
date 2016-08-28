@@ -4,7 +4,9 @@
   yum: name=nginx state=latest
 
 - name: set auto start nginx
+  become: yes
   shell: systemctl enable nginx.service
 
 - name: start nginx
+  become: yes
   shell: systemctl start nginx.service
