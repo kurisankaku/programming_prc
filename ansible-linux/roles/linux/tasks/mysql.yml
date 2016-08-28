@@ -17,14 +17,14 @@
     mysql_slow_query_log_file: "{{__mysql_slow_query_log_file | list }}"
   when: mysql_slow_query_log_file is not defined
 
-- include: setup-RedHat.yml
+- include: mysql-setup-RedHat.yml
 
 - name: Check if MySQL packages were installed.
   set_fact:
     mysql_install_packages: "{{ (rh_mysql_install_packages is defined and rh_mysql_install_packages.changed) or (deb_mysql_install_packages is defined and deb_mysql_install_packages.changed) }}"
 
-- include: configure.yml
-- include: secure-installation.yml
-- include: databases.yml
-- include: users.yml
-- include: replication.yml
+- include: mysql-configure.yml
+- include: mysql-secure-installation.yml
+- include: mysql-databases.yml
+- include: mysql-users.yml
+- include: mysql-replication.yml
