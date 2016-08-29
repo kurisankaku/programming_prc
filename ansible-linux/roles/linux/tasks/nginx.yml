@@ -1,7 +1,11 @@
 ---
-- name: install latest nginx module
+- name: install the nginx rpm from a remote repo
   become: yes
-  yum: name=nginx state=latest
+  yum: name=http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm state=present
+
+- name: install the nginx.
+  become: yes
+  yum: name=nginx state=present
 
 - name: set auto start nginx
   become: yes

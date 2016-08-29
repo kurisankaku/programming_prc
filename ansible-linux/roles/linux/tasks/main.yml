@@ -1,9 +1,9 @@
 ---
-# - name: update yum
-#   become: yes
-#   yum: name=* state=latest
-#
-# - include: git.yml
-# - include: ruby.yml
-#- include: nginx.yml
+- name: update yum
+  become: yes
+  yum: name=* state=latest
+
+- include: git.yml
+- include: ruby.yml
+- include: nginx.yml
 - { include: mysql.yml, become: yes }
