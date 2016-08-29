@@ -4,6 +4,7 @@ __mysql_packages:
   - mariadb
   - mariadb-server
   - mariadb-libs
+  - MySQL-python
 __mysql_slow_query_log_file: /var/log/mysql-solw.log
 mysql_log_error: /var/log/mariadb/mariadb.log
 mysql_syslog_tag: mariadb
