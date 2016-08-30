@@ -1,3 +1,7 @@
 ---
 - name: restart mysql
   service: "name={{ mysql_daemon }} state=restarted sleep=5"
+
+- name: firewalld reload
+  become: yes
+  command: "firewall-cmd --reload"

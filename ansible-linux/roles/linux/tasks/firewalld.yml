@@ -1,0 +1,33 @@
+---
+- name: Install firewalld packages
+  yum: name=firewalld state=present
+
+- name: Ensure firewalld is running and enabled on boot
+  service: name=firewalld state=started enabled=yes
+
+- name: Add firewalld rules for rich rule.
+  firewalld:
+    zone: "{{ item.zone | default('public') }}"
+    permanent: "{{ item.permanent | default(True) }}"
+    state: "{{ item.state | default('enabled') }}"
+    rich_rule: "{{ item.rich_rule }}"
+  with_items: "{{ firewall_allow_rich_rule }}"
+  notify: firewalld reload
+
+- name: Add firewalld rules for services from vars
+  firewalld:
+    service: "{{ item.service }}"
+    zone: "{{ item.zone | default('public') }}"
+    permanent: "{{ item.permanent | default(True) }}"
+    state: "{{ item.state | default('enabled') }}"
+  with_items: "{{ firewall_allow_services }}"
+  notify: firewalld reload
+
+- name: Add firewalld rules for ports from vars
+  firewalld:
+    port: "{{ item.port }}"
+    zone: "{{ item.zone | default('public') }}"
+    permanent: "{{ item.permanent | default(True) }}"
+    state: "{{ item.state | default('enabled') }}"
+  with_items: "{{ firewall_allow_ports }}"
+  notify: firewalld reload
