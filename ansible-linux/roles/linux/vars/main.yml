@@ -120,3 +120,11 @@ firewall_allow_services:
 firewall_allow_ports: []
 firewall_allow_rich_rule: []
   # - { rich_rule: 'rule family="ipv4" source address="192.168.1.1" port protocol="tcp" port="22" accept' }
+
+################################
+# nginx vars.
+###############################
+nginx_unicorn_sock_path: "unix:/var/www/rails_template/shared/tmp/sockets/unicorn.sock"
+nginx_root: "/var/www/rails_template/current/public"
+nginx_access_log: "/var/log/nginx/access.log"
+nginx_error_log: "/var/log/nginx/error.log"

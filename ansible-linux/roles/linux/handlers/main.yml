@@ -5,3 +5,7 @@
 - name: firewalld reload
   become: yes
   command: "firewall-cmd --reload"
+
+- name: reload nginx
+  become: yes
+  service: name=nginx state=reload
