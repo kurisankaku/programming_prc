@@ -5,6 +5,7 @@
 
 - include: git.yml
 - include: ruby.yml
+- include: gem.yml
 - include: nginx.yml
 - { include: mysql.yml, become: yes }
 - { include: firewalld.yml, become: yes }
