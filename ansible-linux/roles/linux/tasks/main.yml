@@ -3,6 +3,7 @@
   become: yes
   yum: name=* state=latest
 
+- include: gcc.yml
 - include: git.yml
 - include: ruby.yml
 - include: gem.yml
