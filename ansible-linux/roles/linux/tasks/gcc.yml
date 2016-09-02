@@ -1,0 +1,4 @@
+---
+- name: install gcc-c++
+  become: yes
+  yum: name=gcc-c++ state=present
