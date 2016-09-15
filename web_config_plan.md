@@ -9,6 +9,14 @@
 ## フロントエンド
 * ビルドシステム
 	* gulp
+    * uglify
+    * minify
+    * es6 compile
+    * sass compile
+    * file rename revision
+    * inject file
+    * browsersync
+    * react compile
 * JavaScript
 	* ECMA Script2016
 * JavaScriptフレームワーク
@@ -38,6 +46,7 @@
 	* 死活監視
 	* プロセス監視
 	* リソース監視
+* docker
 
 今のところNewRelicだけで済ませてみる。
 * CI構築
