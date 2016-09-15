@@ -19,12 +19,14 @@
     * react compile
 * JavaScript
 	* ECMA Script2016
+  * eslint の設定。airbnbのを使うかも
 * JavaScriptフレームワーク
 	* React or Riot or Aurelia
 * Html テンプレートエンジン
 	* 悩み中。。。 ejsを使うかな。
 * Cssのメタ言語
 	* Sass
+  * cssのフレームワークを選定。bootstrap以外の軽量かつboxのやつを選ぶ。
 
 ## バックエンド
 * Webアプリケーションフレームワーク
