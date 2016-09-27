@@ -8,25 +8,36 @@
 
 ## フロントエンド
 * ビルドシステム
-	* gulp
+  * webpack
     * uglify
     * minify
-    * es6 compile
     * sass compile
-    * file rename revision
+    * es6 compile
+    * assets finger print
     * inject file
+      * railsでの読み込みの場合は、やらなくてもいいかも。
+      * 本当にフロントを分けるならやったほうが良い。
     * browsersync
-    * react compile
 * JavaScript
 	* ECMA Script2016
-  * eslint の設定。airbnbのを使うかも
+  * eslint の設定。airbnbを使う
 * JavaScriptフレームワーク
-	* React or Riot or Aurelia
+	* React に決定。Reduxで作成。
+  * Riot
+  * Aurelia
 * Html テンプレートエンジン
-	* 悩み中。。。 ejsを使うかな。
+	* jsx Reactにするので、これで。
+  * ejs
+  * slim
 * Cssのメタ言語
 	* Sass
   * cssのフレームワークを選定。bootstrap以外の軽量かつboxのやつを選ぶ。
+    * pure 暫定で決定。
+    * uikit
+* UIライブラリ
+  * モーダル
+  * トースト
+  * Date Picker
 
 ## バックエンド
 * Webアプリケーションフレームワーク
@@ -49,6 +60,7 @@
 	* プロセス監視
 	* リソース監視
 * docker
+  * コンテナ管理で行うならこれだけど、複雑なものを扱う場合はVMだけ立ち上げてAnsibleで構築なのかな。。
 
 今のところNewRelicだけで済ませてみる。
 * CI構築
