@@ -1,6 +1,7 @@
 module.exports = {
+  devtool: 'inline-source-map',
   entry: {
-    bundle: './app/scripts/app.js',
+    bundle: './app/scripts/index.jsx',
   },
   output: {
     path: `${__dirname}/app/dist`,
@@ -14,5 +15,8 @@ module.exports = {
         loader: 'babel',
       },
     ],
+  },
+  resolve: {
+    extensions: ['', '.js', '.jsx'],
   },
 };
