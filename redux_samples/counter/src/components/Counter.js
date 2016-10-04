@@ -1,13 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 
 class Counter extends Component {
-  const incrementIfOdd = () => {
+  incrementIfOdd = () => {
     if (this.props.value % 2 !== 0) {
       this.props.onIncrement();
     }
   };
 
-  const incrementAsync = () => {
+  incrementAsync = () => {
     setTimeout(this.props.onIncrement, 1000);
   };
 
@@ -36,8 +36,11 @@ class Counter extends Component {
     );
   }
 }
+
 Counter.propTypes = {
     value: PropTypes.number.isRequired,
     onIncrement: PropTypes.func.isRequired,
     onDecrement: PropTypes.func.isRequired
 }
+
+export default Counter;

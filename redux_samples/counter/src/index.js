@@ -10,7 +10,7 @@ const rootEl = document.getElementById('root');
 const render = () =>ReactDOM.render(
   <Counter
     value={store.getState()}
-    onIncrement={() => store.dispatch({ type: 'INCREMNET' })}
+    onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
     onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
   />,
   rootEl
