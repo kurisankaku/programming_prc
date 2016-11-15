@@ -14,5 +14,10 @@
       <p class="alert"><%= alert %></p>
     </header>
     <%= yield %>
+    <footer>
+    <% if user_signed_in? %>
+      <%= button_to("Log out", destroy_user_session_path, method: :delete) %>
+    <% end %>
+    </footer>
   </body>
 </html>
