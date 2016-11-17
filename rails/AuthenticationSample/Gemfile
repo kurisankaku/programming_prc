@@ -33,9 +33,15 @@ gem 'jbuilder', '~> 2.5'
 # Use devise for Authentication.
 gem 'devise'
 
-# Use omniauth for OAuth.
+# Use omniauth for OAuth login.
 gem 'omniauth'
 gem 'omniauth-facebook'
+
+# Use oauth2 for Api login.
+gem 'oauth2'
+
+# Use doorkeeper for OAuth Provider.
+gem 'doorkeeper'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
