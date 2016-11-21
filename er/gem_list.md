@@ -8,7 +8,7 @@
 * OmniAuth
 
 ### 認可
-* banken
+* pundit
 
 ## 論理削除
 * paranoia
