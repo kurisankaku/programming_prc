@@ -1,0 +1,44 @@
+#! /bin/sh
+#
+# Created by configure
+
+CFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches   -m64 -mtune=generic -Wformat-security -fno-strict-aliasing"; export CFLAGS
+"../configure" \
+"--prefix=/etc/httpd22" \
+"--exec-prefix=/usr" \
+"--bindir=/usr/bin" \
+"--sbindir=/usr/sbin" \
+"--mandir=/usr/share/man" \
+"--libdir=/usr/lib64" \
+"--sysconfdir=/etc/httpd22/conf" \
+"--includedir=/usr/include/httpd22" \
+"--libexecdir=/usr/lib64/httpd22/modules" \
+"--datadir=/var/www/httpd22" \
+"--with-installbuilddir=/usr/lib64/httpd22/build" \
+"--with-mpm=prefork" \
+"--with-apr=/usr" \
+"--with-apr-util=/usr" \
+"--enable-suexec" \
+"--with-suexec" \
+"--with-suexec-caller=apache" \
+"--with-suexec-docroot=/var/www/httpd22" \
+"--with-suexec-logfile=/var/log/httpd22/suexec.log" \
+"--with-suexec-bin=/usr/sbin/suexec" \
+"--with-suexec-uidmin=500" \
+"--with-suexec-gidmin=100" \
+"--enable-pie" \
+"--with-pcre" \
+"--enable-mods-shared=all" \
+"--enable-ssl" \
+"--with-ssl" \
+"--enable-proxy" \
+"--enable-cache" \
+"--enable-disk-cache" \
+"--enable-ldap" \
+"--enable-authnz-ldap" \
+"--enable-cgid" \
+"--enable-authn-anon" \
+"--enable-authn-alias" \
+"--disable-imagemap" \
+"CFLAGS=-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -m64 -mtune=generic -Wformat-security -fno-strict-aliasing" \
+"$@"

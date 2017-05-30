@@ -1,0 +1,6 @@
+## Apache SNMP
+LoadModule snmpcommon_module modules/snmpcommon.so
+LoadModule snmpagt_module modules/snmpmonagt.so
+SNMPConf /etc/httpd/conf.d/snmpd
+SNMPVar /var/cache/mod_snmp
+## End of apache SNMP
