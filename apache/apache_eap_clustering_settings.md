@@ -213,6 +213,19 @@ sudo systemctl status httpd
 
 ## EAP6.4の設定
 
+### JDKのインストール
+```
+wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+sudo rpm -e java-1.8.0-openjdk-headless-1.8.0.121-0.b13.el7_3.x86_64
+sudo rpm -ivh jdk-8u131-linux-x64.rpm
+rm jdk-8u131-linux-x64.rpm
+```
+
+bash_profileに下記追加
+```
+export JAVA_HOME=/usr/java/jdk1.8.0_131
+```
+
 ### EAP6.4のダウンロード
 
 /optに移動、EAP6.4をダウンロードし、unzipする。
@@ -232,8 +245,8 @@ EAP実行ユーザーとグループを作成。
 `EAP_HOME`は各環境に合わせて修正すること。
 
 ```
-sudo getent group eap >/dev/null || groupadd -r eap
-sudo getent passwd eap >/dev/null || useradd -r -g eap -s /sbin/nologin  -d EAP_HOME -c "EAP" eap
+sudo getent group eap >/dev/null || sudo groupadd -r eap
+sudo getent passwd eap >/dev/null || sudo useradd -r -g eap -s /sbin/nologin  -d EAP_HOME -c "EAP" eap
 ```
 
 ### EAP_HOMEの権限変更
@@ -253,14 +266,54 @@ sudo chown -R eap:eap EAP_HOME
 cp EAP_HOME/standalone/configuration/standalone-ha.xml EAP_HOME/standalone/configuration/standalone-ha.xml.bk
 ```
 
-### standalone-ha.xmlの変更
+### Serviceに登録
 
-standalone-ha.xmlを使用し、EAPサーバーを起動。その後、jboss-cli.shを使用し、設定を反映していく。
+Serviceに登録し、サーバー起動時にApacheが起動するようにする。
+
+#### Service 作成
+
+以下のように、serviceファイルを作成
+```
+sudo touch /etc/systemd/system/jbosseap6.service
+```
+
+`jbosseap6.service`に下記を記載し保存。
+`EAP_HOME`は各環境に合わせて修正すること。
 `192.168.33.11`の部分に関しては、各環境のサーバーのIPを設定すること。
 
+* jbosseap6.service
 ```
-EAP_HOME/bin/standalone.sh -c standalone-ha.xml -b 192.168.33.11
+	[Unit]
+	Description=JBoss EAP Systemctl script
+    After=NetworkManager.service
+
+    [Service]
+    Type=forking
+    ExecStart=EAP_HOME/bin/init.d/jboss-as-standalone.sh start
+    ExecStop=EAP_HOME/bin/init.d/jboss-as-standalone.sh stop
+    ExecReload=EAP_HOME/bin/init.d/jboss-as-standalone.sh restart
+    PIDFile=/var/run/jboss-as/jboss-as-standalone.pid
+	# Environment
+	Environment="JAVA_HOME=/usr/java/jdk1.8.0_131"
+	Environment="JBOSS_HOME=EAP_HOME"
+	Environment="JBOSS_CONFIG=standalone-ha.xml -b 192.168.33.11"
+	Environment="JBOSS_USER=eap"
+
+    [Install]
+	WantedBy=multi-user.target
 ```
+
+#### Service登録
+
+下記を入力し、Serviceを登録しスタート。
+
+```
+sudo systemctl enable httpd
+sudo systemctl start httpd
+sudo systemctl status httpd
+```
+
+### standalone-ha.xmlの変更
 
 #### modclusterの設定
 
@@ -277,6 +330,7 @@ EAP_HOME/bin/standalone.sh -c standalone-ha.xml -b 192.168.33.11
 
 jboss-cli.shでstandalone-ha.xmlに反映。
 ```
+cd EAP_HOME/bin
 sudo ./jboss-cli.sh -c --file=mod-cluster-config
 sudo ./jboss-cli.sh -c command="shutdown --restart=true"
 sudo rm mod-cluster-config
@@ -314,6 +368,7 @@ sudo rm mod-cluster-config
 
 jboss-cli.shでstandalone-ha.xmlに反映。
 ```
+cd EAP_HOME/bin
 sudo ./jboss-cli.sh -c --file=tcpping
 sudo ./jboss-cli.sh -c command="shutdown --restart=true"
 sudo rm tcpping
