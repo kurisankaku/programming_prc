@@ -46,10 +46,17 @@ sudo yum install mailcap
 
 ### modulesの不明なsymbolick linkの削除
 
-`JBOSS_EWS_HOME/httpd/modules` 内に不明なsymbolic linkがあった場合は、必要かどうかを判断し、必要ない場合は削除する。例えば、`auth_kerb.so`は今回必要無いので、symbolic linkが不明な場合は削除する。
+`JBOSS_EWS_HOME/httpd/modules` 内に不明なsymbolic linkがあった場合は、必要かどうかを判断し、必要ない場合は削除する。例えば、`mod_auth_kerb.so`は今回必要無いので、symbolic linkが不明な場合は削除する。
 
 ```
-sudo unlink JBOSS_EWS_HOME/httpd/modules/auth_kerb.so
+sudo unlink JBOSS_EWS_HOME/httpd/modules/mod_auth_kerb.so
+```
+
+### conf.dの不明なsymbolick linkの削除
+`JBOSS_EWS_HOME/httpd/conf.d` 内に不明なsymbolic linkがあった場合は、必要かどうかを判断し、必要ない場合は削除する。例えば、`auth_kerb.conf`は今回必要無いので、symbolic linkが不明な場合は削除する。
+
+```
+sudo unlink JBOSS_EWS_HOME/httpd/conf.d/auth_kerb.conf
 ```
 
 ### connectorのモジュールを追加
@@ -68,7 +75,7 @@ cd /tmp
 sudo wget [jboss-eap-6.4用のconnectorダウンロードパス]
 sudo unzip -q [jboss-eap-6.4用のconnectorのzipパス]
 sudo cp -pi [connectorのmodulesまでのパス]/* JBOSS_EWS_HOME/httpd/modules/.
-sudo rm [connectorのフォルダ]
+sudo rm -rf [connectorのフォルダ]
 sudo rm [jboss-eap-6.4用のconnectorのzipパス]
 ```
 ### .postinstallの実行
@@ -76,7 +83,8 @@ sudo rm [jboss-eap-6.4用のconnectorのzipパス]
 postinstallを実行し、実行環境に合わせた設定ファイルに設定する。
 
 ```
-sudo JBOSS_EWS_HOME/httpd/.postinstall
+cd JBOSS_EWS_HOME/httpd
+sudo ./.postinstall
 ```
 
 ### httpd.confの修正
@@ -86,7 +94,7 @@ sudo JBOSS_EWS_HOME/httpd/.postinstall
 初期状態に戻せるように、バックアップを作成しておく。
 
 ```
-cp JBOSS_EWS_HOME/httpd/conf/httpd.conf JBOSS_EWS_HOME/httpd/conf/httpd.conf.bk
+sudo cp JBOSS_EWS_HOME/httpd/conf/httpd.conf JBOSS_EWS_HOME/httpd/conf/httpd.conf.bk
 ```
 
 #### 追加したモジュールをロード
@@ -110,15 +118,6 @@ LoadModule advertise_module JBOSS_EWS_HOME/httpd/modules/mod_advertise.so
 * httpd.conf
 ```
 ##LoadModule proxy_balancer_module /opt/jboss-ews-2.1/httpd/modules/mod_proxy_balancer.so
-```
-
-#### ServerName
-
-ServerNameを各環境に合わせて修正。下記は例。
-
-* httpd.conf
-```
-ServerName 192.168.33.10:80
 ```
 
 ### VirtualHostの設定
@@ -151,8 +150,8 @@ apache実行ユーザーとグループを作成。
 `JBOSS_EWS_HOME`は各環境に合わせて修正すること。
 
 ```
-sudo getent group apache >/dev/null || groupadd -g 48 -r apache
-sudo getent passwd apache >/dev/null || useradd -r -u 48 -g apache -s /sbin/nologin  -d JBOSS_EWS_HOME/httpd/www -c "Apache" apache
+sudo getent group apache >/dev/null || sudo groupadd -g 48 -r apache
+sudo getent passwd apache >/dev/null || sudo useradd -r -u 48 -g apache -s /sbin/nologin  -d JBOSS_EWS_HOME/httpd/www -c "Apache" apache
 ```
 
 ### JBOSS_EWS_HOMEの権限変更
@@ -181,17 +180,25 @@ sudo touch /etc/systemd/system/httpd.service
 * httpd.service
 ```
 [Unit]
-Description = httpd
+Description=The Apache HTTP Server
+After=network.target remote-fs.target nss-lookup.target
 
 [Service]
-ExecStart = JBOSS_EWS_HOME/httpd/sbin/apachectl start
-Restart = always
-Type = simple
-User=apache
-Group=apache
+Type=forking
+ExecStart=JBOSS_EWS_HOME/httpd/sbin/apachectl start
+ExecReload=JBOSS_EWS_HOME/httpd/sbin/apachectl restart
+ExecStop=JBOSS_EWS_HOME/httpd/sbin/apachectl graceful-stop
+
+# We want systemd to give httpd some time to finish gracefully, but still want
+# it to kill httpd after TimeoutStopSec if something went wrong during the
+# graceful stop. Normally, Systemd sends SIGTERM signal right after the
+# ExecStop, which would kill httpd. We are sending useless SIGCONT here to give
+# httpd time to finish.
+KillSignal=SIGCONT
+PrivateTmp=true
 
 [Install]
-WantedBy = multi-user.target
+WantedBy=multi-user.target
 ```
 
 #### Service登録
@@ -274,8 +281,6 @@ sudo ./jboss-cli.sh -c --file=mod-cluster-config
 sudo ./jboss-cli.sh -c command="shutdown --restart=true"
 sudo rm mod-cluster-config
 ```
-
-
 
 下記内容のファイルを作成(ファイル名はなんでもよい)。
 `value="192.168.33.11[7600],192.168.33.12[7600]"`には、各環境のeapサーバーのIPを記載。IPが複数ある際はカンマ区切りで記載する。
