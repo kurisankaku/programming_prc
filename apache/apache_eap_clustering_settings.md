@@ -89,19 +89,21 @@ sudo JBOSS_EWS_HOME/httpd/.postinstall
 cp JBOSS_EWS_HOME/httpd/conf/httpd.conf JBOSS_EWS_HOME/httpd/conf/httpd.conf.bk
 ```
 
-#### 追加したモジュールをロードするように、`httpd.conf`のLoadModules一覧に下記を追加。
+#### 追加したモジュールをロード
+
+`JBOSS_EWS_HOME/httpd/conf/httpd.conf`のLoadModules一覧に下記を追加。
 
 `JBOSS_EWS_HOME`は各環境に合わせて修正すること。
 
 * httpd.conf
 ```
-LoadModule proxy_cluster_module /opt/jboss-ews-2.1/httpd/modules/mod_proxy_cluster.so
-LoadModule slotmem_module /opt/jboss-ews-2.1/httpd/modules/mod_slotmem.so
-LoadModule manager_module /opt/jboss-ews-2.1/httpd/modules/mod_manager.so
-LoadModule advertise_module /opt/jboss-ews-2.1/httpd/modules/mod_advertise.so
+LoadModule proxy_cluster_module JBOSS_EWS_HOME/httpd/modules/mod_proxy_cluster.so
+LoadModule slotmem_module JBOSS_EWS_HOME/httpd/modules/mod_slotmem.so
+LoadModule manager_module JBOSS_EWS_HOME/httpd/modules/mod_manager.so
+LoadModule advertise_module JBOSS_EWS_HOME/httpd/modules/mod_advertise.so
 ```
 
-#### `mod_proxy_balancer`がロードされている場合は、ロードしないようにコメントアウトをする。
+##### `mod_proxy_balancer`がロードされている場合は、ロードしないようにコメントアウトをする。
 
 下記は例。
 
@@ -122,7 +124,7 @@ ServerName 192.168.33.10:80
 ### VirtualHostの設定
 
 VirtualHostを設定し、アクセス制限、ManagerBalanceNameなどの設定をする。
-`JBOSS_EWS_HOME/conf.d`の直下に、`virtualhost.conf`ファイルを作成し、下記を記載し保存する。
+`JBOSS_EWS_HOME/httpd/conf.d`の直下に、`virtualhost.conf`ファイルを作成し、下記を記載し保存する。
 
 `ManagerBalancerName`の値は、EAPの設定をする際に使用。
 
@@ -142,3 +144,181 @@ VirtualHostを設定し、アクセス制限、ManagerBalanceNameなどの設定
 	ServerAdvertise Off  
 </VirtualHost>
 ```
+
+### apache 実行ユーザー作成
+
+apache実行ユーザーとグループを作成。
+`JBOSS_EWS_HOME`は各環境に合わせて修正すること。
+
+```
+sudo getent group apache >/dev/null || groupadd -g 48 -r apache
+sudo getent passwd apache >/dev/null || useradd -r -u 48 -g apache -s /sbin/nologin  -d JBOSS_EWS_HOME/httpd/www -c "Apache" apache
+```
+
+### JBOSS_EWS_HOMEの権限変更
+
+`JBOSS_EWS_HOME`配下をapacheユーザーが実行するように変更
+`JBOSS_EWS_HOME`は各環境に合わせて修正すること。
+
+```
+sudo chown -R apache:apache JBOSS_EWS_HOME
+```
+
+### Serviceに登録
+
+Serviceに登録し、サーバー起動時にApacheが起動するようにする。
+
+#### Service 作成
+
+以下のように、serviceファイルを作成
+```
+sudo touch /etc/systemd/system/httpd.service
+```
+
+`httpd.service`に下記を記載し保存。
+`JBOSS_EWS_HOME`は各環境に合わせて修正すること。
+
+* httpd.service
+```
+[Unit]
+Description = httpd
+
+[Service]
+ExecStart = JBOSS_EWS_HOME/httpd/sbin/apachectl start
+Restart = always
+Type = simple
+User=apache
+Group=apache
+
+[Install]
+WantedBy = multi-user.target
+```
+
+#### Service登録
+
+下記を入力し、Serviceを登録しスタート。
+
+```
+sudo systemctl enable httpd
+sudo systemctl start httpd
+sudo systemctl status httpd
+```
+
+## EAP6.4の設定
+
+### EAP6.4のダウンロード
+
+/optに移動、EAP6.4をダウンロードし、unzipする。
+
+```
+cd /opt
+sudo wget [EAP6.4のダウンロードパス]
+sudo unzip -q [EAP6.4のzipパス]
+sudo rm [EAP6.4のzipパス]
+```
+
+unzipしたフォルダのパス（例えば /opt/EAP6.4）を以降は、`EAP_HOME`と呼ぶ。
+
+### EAP 実行ユーザー作成
+
+EAP実行ユーザーとグループを作成。
+`EAP_HOME`は各環境に合わせて修正すること。
+
+```
+sudo getent group eap >/dev/null || groupadd -r eap
+sudo getent passwd eap >/dev/null || useradd -r -g eap -s /sbin/nologin  -d EAP_HOME -c "EAP" eap
+```
+
+### EAP_HOMEの権限変更
+
+`EAP_HOME`配下をapacheユーザーが実行するように変更
+`EAP_HOME`は各環境に合わせて修正すること。
+
+```
+sudo chown -R eap:eap EAP_HOME
+```
+
+### standalone-ha.xmlのバックアップ作成
+
+初期状態に戻せるように、バックアップを作成しておく。
+
+```
+cp EAP_HOME/standalone/configuration/standalone-ha.xml EAP_HOME/standalone/configuration/standalone-ha.xml.bk
+```
+
+### standalone-ha.xmlの変更
+
+standalone-ha.xmlを使用し、EAPサーバーを起動。その後、jboss-cli.shを使用し、設定を反映していく。
+`192.168.33.11`の部分に関しては、各環境のサーバーのIPを設定すること。
+
+```
+EAP_HOME/bin/standalone.sh -c standalone-ha.xml -b 192.168.33.11
+```
+
+#### modclusterの設定
+
+下記内容のファイルを作成(ファイル名はなんでもよい)。
+`value=mycluster` がapacheで設定した`ManagerBalancerName`の値と同じにする。
+`value="192.168.33.10:80"`には、各環境のapacheのIPを記載。IPが複数ある際はカンマ区切りで記載する。
+
+* mod-cluster-config
+```
+  /subsystem=modcluster/mod-cluster-config=configuration/:write-attribute(name=load-balancing-group,value=myGroup)
+  /subsystem=modcluster/mod-cluster-config=configuration/:write-attribute(name=balancer,value=mycluster)
+  /subsystem=modcluster/mod-cluster-config=configuration/:write-attribute(name=proxy-list,value="192.168.33.10:80")
+```
+
+jboss-cli.shでstandalone-ha.xmlに反映。
+```
+sudo ./jboss-cli.sh -c --file=mod-cluster-config
+sudo ./jboss-cli.sh -c command="shutdown --restart=true"
+sudo rm mod-cluster-config
+```
+
+
+
+下記内容のファイルを作成(ファイル名はなんでもよい)。
+`value="192.168.33.11[7600],192.168.33.12[7600]"`には、各環境のeapサーバーのIPを記載。IPが複数ある際はカンマ区切りで記載する。
+
+* tcpping
+```
+    batch
+    /subsystem=jgroups/stack=tcp:remove
+    /subsystem=jgroups/stack=tcp:add(transport={"type" =>"TCP", "socket-binding" => "jgroups-tcp"})
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=TCPPING)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=MERGE2)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=FD_SOCK,socket-binding=jgroups-tcp-fd)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=FD)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=VERIFY_SUSPECT)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=BARRIER)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=pbcast.NAKACK)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=UNICAST2)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=pbcast.STABLE)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=pbcast.GMS)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=UFC)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=MFC)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=FRAG2)
+    /subsystem=jgroups/stack=tcp/:add-protocol(type=RSVP)
+    /subsystem=jgroups:write-attribute(name=default-stack,value=tcp)
+    run-batch
+    /subsystem=jgroups/stack=tcp/protocol=TCPPING/property=initial_hosts/:add(value="192.168.33.11[7600],192.168.33.12[7600]")
+    /subsystem=jgroups/stack=tcp/protocol=TCPPING/property=port_range/:add(value=0)
+    /subsystem=jgroups/stack=tcp/protocol=TCPPING/property=timeout/:add(value=3000)
+    /subsystem=jgroups/stack=tcp/protocol=TCPPING/property=num_initial_members/:add(value=3)
+```
+
+jboss-cli.shでstandalone-ha.xmlに反映。
+```
+sudo ./jboss-cli.sh -c --file=tcpping
+sudo ./jboss-cli.sh -c command="shutdown --restart=true"
+sudo rm tcpping
+```
+
+## Apache, EAP の起動
+
+Apache, EAPを起動し、ApacheのIPで各EAPにリクエストが届くことを確認する。
+EAPの起動時は、
+```
+EAP_HOME/bin/standalone.sh -c standalone-ha.xml -b 192.168.33.11
+```
+のように、`-b`オプションで自身のIPを指定することを忘れないこと。
