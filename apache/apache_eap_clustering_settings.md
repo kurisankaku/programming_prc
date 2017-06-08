@@ -127,6 +127,8 @@ VirtualHostを設定し、アクセス制限、ManagerBalanceNameなどの設定
 
 `ManagerBalancerName`の値は、EAPの設定をする際に使用。
 
+#### ServerAdvertiseを使用しない場合
+
 * virtualhost.conf
 ```
 <VirtualHost *:80>  
@@ -143,6 +145,47 @@ VirtualHostを設定し、アクセス制限、ManagerBalanceNameなどの設定
 	ServerAdvertise Off  
 </VirtualHost>
 ```
+
+#### ServerAdvertiseを使用し、マルチキャストする場合
+
+`192.168.33.10`の値は各サーバー自身のIPを入れること。
+
+* virtualhost.conf
+```
+Listen 192.168.33.10:6666
+<VirtualHost 192.168.33.10:6666>
+  ServerName 192.168.33.10
+  <Directory />
+   Order deny,allow
+   Deny from all
+   Allow from 192.168.33.
+  </Directory>
+  <Location /mod_cluster-manager>
+   SetHandler mod_cluster-manager
+   Order deny,allow
+   Deny from all
+   Allow from 192.168.33.
+  </Location>
+
+  KeepAliveTimeout 60
+  MaxKeepAliveRequests 0
+  EnableMCPMReceive On
+
+  ManagerBalancerName mycluster
+  AdvertiseFrequency 5
+  ServerAdvertise On
+</VirtualHost>
+```
+
+また、mod_cluster が advertise パケットをマルチキャストアドレス 224.0.1.105 に対して送信するため、route コマンドでルーティングを定義。
+
+`eth1`はifconfigで調べた各サーバーのdevを入力すること。
+```
+route add -host 224.0.1.105 dev eth1
+```
+
+これはサーバーを再起動すると消えてしまう一時的なもののため、永続する場合は静的ルーティングを行うこと。
+
 
 ### apache 実行ユーザー作成
 
@@ -308,12 +351,15 @@ sudo touch /etc/systemd/system/jbosseap6.service
 下記を入力し、Serviceを登録しスタート。
 
 ```
-sudo systemctl enable httpd
-sudo systemctl start httpd
-sudo systemctl status httpd
+sudo systemctl enable jbosseap6
+sudo systemctl start jbosseap6
+sudo systemctl status jbosseap6
 ```
 
 ### standalone-ha.xmlの変更
+
+ここからは、mod_clusterのAdvertiseを使用しない、静的なルーティングをする場合に設定する。
+AWSなどのクラウド環境では、マルチキャストを行えないので、ここから下の設定は必須である。
 
 #### modclusterの設定
 
