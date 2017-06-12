@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<server xmlns="urn:jboss:domain:1.7">
+<server xmlns="urn:jboss:domain:1.8">
 
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
@@ -459,10 +459,4 @@
             <remote-destination host="localhost" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
-
-    <deployments>
-        <deployment name="wch-ear.ear" runtime-name="wch-ear.ear">
-            <content sha1="f3badf10f630d87a451604014b276e1af3bfa9bb"/>
-        </deployment>
-    </deployments>
 </server>
