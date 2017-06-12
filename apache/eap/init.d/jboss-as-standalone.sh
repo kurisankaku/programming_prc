@@ -34,12 +34,8 @@ if [ -z "$JBOSS_PIDFILE" ]; then
 fi
 export JBOSS_PIDFILE
 
-##if [ -z "$JBOSS_CONSOLE_LOG" ]; then
-##  JBOSS_CONSOLE_LOG=/var/log/jboss-as/console.log
-##fi
-
-if [ -z "$JBOSS_SERVER_LOG" ]; then
-  JBOSS_SERVER_LOG=$JBOSS_HOME/standalone/log/server.log
+if [ -z "$JBOSS_CONSOLE_LOG" ]; then
+  JBOSS_CONSOLE_LOG=/var/log/jboss-as/console.log
 fi
 
 if [ -z "$STARTUP_WAIT" ]; then
@@ -56,7 +52,10 @@ fi
 
 JBOSS_SCRIPT=$JBOSS_HOME/bin/standalone.sh
 
+JBOSS_MARKERFILE=$JBOSS_HOME/standalone/tmp/startup-marker
+
 prog='jboss-as'
+currenttime=$(date +%s%N | cut -b1-13)
 
 CMD_PREFIX=''
 
@@ -89,12 +88,13 @@ start() {
   #$CMD_PREFIX JBOSS_PIDFILE=$JBOSS_PIDFILE $JBOSS_SCRIPT 2>&1 > $JBOSS_CONSOLE_LOG &
   #$CMD_PREFIX JBOSS_PIDFILE=$JBOSS_PIDFILE $JBOSS_SCRIPT &
 
-  start_up_count=`grep 'JBAS015874:' $JBOSS_SERVER_LOG 2> /dev/null | wc -l`
   if [ ! -z "$JBOSS_USER" ]; then
     if [ -r /etc/rc.d/init.d/functions ]; then
+      cd $JBOSS_HOME
       daemon --user $JBOSS_USER LAUNCH_JBOSS_IN_BACKGROUND=1 JBOSS_PIDFILE=$JBOSS_PIDFILE $JBOSS_SCRIPT -c $JBOSS_CONFIG > /dev/null 2>&1 &
+      cd -
     else
-      su - $JBOSS_USER -c "LAUNCH_JBOSS_IN_BACKGROUND=1 JBOSS_PIDFILE=$JBOSS_PIDFILE $JBOSS_SCRIPT -c $JBOSS_CONFIG" > /dev/null 2>&1 &
+      su - $JBOSS_USER -c "cd $JBOSS_HOME; LAUNCH_JBOSS_IN_BACKGROUND=1 JBOSS_PIDFILE=$JBOSS_PIDFILE $JBOSS_SCRIPT -c $JBOSS_CONFIG" > /dev/null 2>&1 &
     fi
   fi
 
@@ -103,20 +103,22 @@ start() {
 
   until [ $count -gt $STARTUP_WAIT ]
   do
-    now_start_up_count=`grep 'JBAS015874:' $JBOSS_SERVER_LOG 2> /dev/null | wc -l` 
-    if [ $now_start_up_count -eq `expr $start_up_count + 1` ] ; then
-      launched=true
-      break
-    fi 
     sleep 1
     let count=$count+1;
+    if [ -f $JBOSS_MARKERFILE ]; then
+      markerfiletimestamp=$(grep -o '[0-9]*' $JBOSS_MARKERFILE) > /dev/null
+      if [ "$markerfiletimestamp" -gt "$currenttime" ] ; then
+        grep -i 'success:' $JBOSS_MARKERFILE > /dev/null
+        if [ $? -eq 0 ] ; then
+          launched=true
+          break
+        fi
+      fi
+    fi
   done
 
   if [ "$launched" = "false" ] ; then
-    echo "$prog failed to startup in the time allotted"
-    failure
-    echo
-    return 7
+    echo "$prog started with errors, please see server log for details"
   fi
 
   success
@@ -185,4 +187,3 @@ case "$1" in
       exit 1
       ;;
 esac
-
