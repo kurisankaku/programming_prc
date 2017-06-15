@@ -98,6 +98,38 @@ sudo ./.postinstall
 sudo cp /opt/jboss-ews-2.1/httpd/conf/httpd.conf /opt/jboss-ews-2.1/httpd/conf/httpd.conf.bk
 ```
 
+#### Apacheのバージョン情報の非表示
+
+Apacheのバージョン情報をレスポンスで返さないようにする。
+httpd.confの以下の二点を変更すること。
+
+```
+ServerTokens OS
+↓変更後
+ServerTokens Prod
+```
+
+```
+ServerSignature On
+↓変更後
+ServerSignature Off
+```
+
+#### Apacheのテストページを非表示にする
+
+`/opt/jboss-ews-2.1/httpd/conf.d/welcome.conf`の中身をすべてコメントアウトする。
+
+#### Apacheのディレクトリを非表示にする
+
+ディレクトリ一覧が出ないようにします。
+http.confを以下のように変更すること。
+
+```
+Options Indexes FollowSymLinks
+↓変更後
+Options -Indexes FollowSymLinks
+```
+
 #### 追加したモジュールをロード
 
 `/opt/jboss-ews-2.1/httpd/conf/httpd.conf`のLoadModules一覧に下記を追加。

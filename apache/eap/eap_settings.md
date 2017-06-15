@@ -70,7 +70,7 @@ sudo chown -R eap:eap /opt/jboss-eap-6.4
 初期状態に戻せるように、バックアップを作成しておく。
 
 ```
-cp /opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml /opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml.bk
+sudo cp /opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml /opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml.bk
 ```
 
 ### ログ設定
@@ -114,9 +114,8 @@ sudo touch /etc/systemd/system/jbosseap6.service
   # Environment
   Environment="JAVA_HOME=/usr/java/jdk1.8.0_131"
   Environment="JBOSS_HOME=/opt/jboss-eap-6.4"
-  Environment="JBOSS_CONFIG=standalone-ha.xml -b 0.0.0.0"
+  Environment="JBOSS_CONFIG=standalone-ha.xml -b 0.0.0.0 -bmanagement=0.0.0.0"
   Environment="JBOSS_USER=eap"
-  Environment="JBOSS_SERVER_LOG=/opt/jboss-eap-6.4/standalone/log/server/server.log"
 
   [Install]
   WantedBy=multi-user.target
