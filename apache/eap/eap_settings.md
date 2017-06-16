@@ -78,6 +78,20 @@ sudo cp /opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml /opt/jboss
 `/opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml`内の `<subsystem xmlns="urn:jboss:domain:logging:1.5">~</subsystem>` を
 `wch/server_config/eap/standalone-ha.xml`内の `<subsystem xmlns="urn:jboss:domain:logging:1.5">~</subsystem>` に置き換え。
 
+#### crontabにログの削除処理を登録
+
+dailyでログローテーションをする場合、古いログを削除する機能はないため、crontabを登録する。
+
+更新日時が-mminの値よりも古いファイルを削除する。
+
+`/var/spool/cron/eap`ファイルを作成し、下記内容を保存すること。（下記例では、更新日時が20日より古いファイルを消去している）
+
+```
+1 0 * * * find /opt/jboss-eap-6.4/standalone/log/access/ -name "*.log.*" -type f -mmin +28800 -delete
+2 0 * * * find /opt/jboss-eap-6.4/standalone/log/application/ -name "*.log.*" -type f -mmin +28800 -delete
+3 0 * * * find /opt/jboss-eap-6.4/standalone/log/server/ -name "*.log.*" -type f -mmin +28800 -delete
+```
+
 ### Serviceに登録
 
 Serviceに登録し、サーバー起動時にApacheが起動するようにする。
@@ -103,7 +117,7 @@ sudo touch /etc/systemd/system/jbosseap6.service
 ```
   [Unit]
   Description=JBoss EAP Systemctl script
-  After=NetworkManager.service
+  After=NetworkManager.service network.target network-online.target remote-fs.target nss-lookup.target
 
   [Service]
   Type=forking
