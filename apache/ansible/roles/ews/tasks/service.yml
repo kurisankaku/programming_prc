@@ -1,0 +1,13 @@
+---
+- name: Create service file
+  become: yes
+  template:
+    src: httpd.service.j2
+    dest: /etc/systemd/system/httpd.service
+
+- name: Ensure httpd is running and enabled on boot
+  become: yes
+  service:
+    name: httpd
+    state: started
+    enabled: yes

@@ -1,0 +1,42 @@
+---
+- name: Install yum module
+  become: yes
+  yum:
+    name: "{{item}}"
+    state: latest
+  with_items:
+    - apr-util
+    - mailcap
+
+- name: Unlink not linked file
+  become: yes
+  file:
+    path: "{{item}}"
+    state: absent
+  with_items: "{{unlink_symbolick_link_modules}}"
+
+- name: Download mod_cluster connectors
+  become: yes
+  get_url:
+    url: "{{mod_cluster_connector_download_url}}"
+    dest: /tmp
+
+- name: Unzip mod cluster connector zip file
+  become: yes
+  command: unzip -q /tmp/{{mod_cluster_connector_zip_file_name}} -d /tmp
+
+- name: Delete jboss ews zip file
+  become: yes
+  file:
+    path: "/tmp/{{mod_cluster_connector_zip_file_name}}"
+    state: absent
+
+- name: Move connector files to ews modules directory
+  become: yes
+  shell: mv -n /tmp/{{mod_cluster_connector_unzip_dir_name}}/modules/system/layers/base/native/lib64/httpd/modules/*  {{ews_home}}/httpd/modules/.
+
+- name: Delete connector dir
+  become: yes
+  file:
+    path: "/tmp/{{mod_cluster_connector_unzip_dir_name}}"
+    state: absent

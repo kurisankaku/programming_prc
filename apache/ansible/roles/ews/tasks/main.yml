@@ -1,0 +1,20 @@
+---
+- name: Fetch ews home state
+  stat:
+    path: "{{ews_home}}"
+  register: ews_home_state
+
+- include: install.yml
+  when: not ews_home_state.stat.exists
+
+- include: modules.yml
+
+- include: user_group.yml
+
+- include: service.yml
+
+- include: httpd_conf.yml
+
+- include: conf_d.yml
+
+- include: logrotate.yml

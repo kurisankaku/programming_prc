@@ -1,0 +1,16 @@
+---
+- name: Remove welcome.conf
+  become: yes
+  become_user: "{{ews_user}}"
+  file:
+    path: "{{ews_home}}/httpd/conf.d/welcome.conf"
+    state: absent
+  notify: restart httpd
+
+- name: Generate virtualhost.conf to set server advertise
+  become: yes
+  become_user: "{{ews_user}}"
+  template:
+    src: virtualhost.conf.j2
+    dest: "{{ews_home}}/httpd/conf.d/virtualhost.conf"
+  notify: restart httpd

@@ -1,0 +1,38 @@
+---
+- name: Install jboss ews
+  become: yes
+  get_url:
+    url: "{{ews_download_url}}"
+    dest: /tmp
+
+- name: Unzip jboss ews zip file
+  become: yes
+  command: unzip -q /tmp/{{ews_downloaded_zip_file_name}} -d /tmp
+
+- name: Delete jboss ews zip file
+  become: yes
+  file:
+    path: "/tmp/{{ews_downloaded_zip_file_name}}"
+    state: absent
+
+- name: Make ews home directory
+  become: yes
+  file:
+    path: "{{ews_home}}"
+    state: directory
+
+- name: Move ews unzip files to ews_home directory
+  become: yes
+  shell: mv /tmp/{{ews_unzip_dir_name}}/* {{ews_home}}/.
+
+- name: Delete jboss ews unzip dir
+  become: yes
+  file:
+    path: "/tmp/{{ews_unzip_dir_name}}"
+    state: absent
+
+- name: Execute .postinstall
+  become: yes
+  command: ./.postinstall
+  args:
+    chdir: "{{ews_home}}/httpd"

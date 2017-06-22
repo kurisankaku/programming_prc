@@ -1,0 +1,11 @@
+{{ews_home}}/httpd/logs/*log {
+  {{logrotate.period | default('daily')}}
+  dateext
+  dateformat {{logrotate.dateformat | default('-%Y%m%d')}}
+  missingok
+  rotate {{logrotate.rotate | default('20')}}
+  compress
+  delaycompress
+  ifempty
+  copytruncate
+}

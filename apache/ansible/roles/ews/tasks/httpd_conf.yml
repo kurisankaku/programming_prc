@@ -1,0 +1,63 @@
+---
+- name: Change user and group
+  become: yes
+  become_user: "{{ews_user}}"
+  lineinfile:
+    dest: "{{ews_home}}/httpd/conf/httpd.conf"
+    state: present
+    regexp: "{{item.regexp}}"
+    line: "{{item.line}}"
+  with_items:
+    - regexp: "^User .*"
+      line: "User {{ews_user}}"
+    - regexp: "^Group .*"
+      line: "Group {{ews_group}}"
+  notify: restart httpd
+
+- name: Change ServerTokens state to Prod
+  become: yes
+  become_user: "{{ews_user}}"
+  lineinfile:
+    dest: "{{ews_home}}/httpd/conf/httpd.conf"
+    state: present
+    regexp: "^(.*)ServerTokens OS"
+    line: "ServerTokens Prod"
+  notify: restart httpd
+
+- name: Change ServerSignature state to Off
+  become: yes
+  become_user: "{{ews_user}}"
+  lineinfile:
+    dest: "{{ews_home}}/httpd/conf/httpd.conf"
+    state: present
+    regexp: "^(.*)ServerSignature On"
+    line: "ServerSignature Off"
+  notify: restart httpd
+
+- name: Hide directory display of server
+  become: yes
+  become_user: "{{ews_user}}"
+  lineinfile:
+    dest: "{{ews_home}}/httpd/conf/httpd.conf"
+    state: present
+    regexp: "^(.*)Options Indexes FollowSymLinks"
+    line: "Options -Indexes FollowSymLinks"
+  notify: restart httpd
+
+- name: Load mod_cluster modules
+  become: yes
+  become_user: "{{ews_user}}"
+  replace:
+    path: "{{ews_home}}/httpd/conf/httpd.conf"
+    regexp: "{{item.regexp}}"
+    replace: "{{item.replace}}"
+  with_items:
+    - regexp: '^(.*)#LoadModule proxy_cluster_module(.*)'
+      replace: '\1LoadModule proxy_cluster_module\2'
+    - regexp: '^(.*)#LoadModule slotmem_module(.*)'
+      replace: '\1LoadModule slotmem_module\2'
+    - regexp: '^(.*)#LoadModule manager_module(.*)'
+      replace: '\1LoadModule manager_module\2'
+    - regexp: '^(.*)#LoadModule advertise_module(.*)'
+      replace: '\1LoadModule advertise_module\2'
+  notify: restart httpd

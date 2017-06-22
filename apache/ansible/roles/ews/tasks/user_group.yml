@@ -1,0 +1,23 @@
+---
+- name: Create ews group
+  become: yes
+  group:
+    name: "{{ews_group}}"
+    state: present
+
+- name: Create ews user
+  become: yes
+  user:
+    name: "{{ews_user}}"
+    group: "{{ews_group}}"
+    non_unique: yes
+    shell: /sbin/nologin
+    createhome: no
+
+- name: Change ews directory owner
+  become: yes
+  file:
+    recurse: yes
+    path: "{{ews_home}}"
+    owner: "{{ews_user}}"
+    group: "{{ews_group}}"

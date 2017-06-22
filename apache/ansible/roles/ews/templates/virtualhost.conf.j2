@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+  <Location />
+    Order deny,allow
+    Allow from all
+  </Location>
+
+  KeepAliveTimeout 60
+  MaxKeepAliveRequests 0
+  EnableMCPMReceive
+
+  ManagerBalancerName mycluster
+  ServerAdvertise Off
+</VirtualHost>
