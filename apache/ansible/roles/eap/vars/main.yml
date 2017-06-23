@@ -20,7 +20,3 @@ eap_logs:
   - { dir: "{{eap_home}}/standalone/log/access/", delete_span: "28800" }
   - { dir: "{{eap_home}}/standalone/log/application/", delete_span: "28800" }
   - { dir: "{{eap_home}}/standalone/log/server/", delete_span: "28800" }
-
-######################
-# crontab
-######################
