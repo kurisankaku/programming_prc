@@ -1,0 +1,23 @@
+---
+- name: Create eap group
+  become: yes
+  group:
+    name: "{{eap_group}}"
+    state: present
+
+- name: Create eap user
+  become: yes
+  user:
+    name: "{{eap_user}}"
+    group: "{{eap_group}}"
+    non_unique: yes
+    shell: /sbin/nologin
+    createhome: no
+
+- name: Change ews directory owner
+  become: yes
+  file:
+    recurse: yes
+    path: "{{eap_home}}"
+    owner: "{{eap_user}}"
+    group: "{{eap_group}}"

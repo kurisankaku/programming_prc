@@ -1,0 +1,10 @@
+---
+- name: Add crontab to rotate eap log
+  become: yes
+  cron:
+    name: "delete {{item.dir}} old log"
+    minute: 0
+    hour: 0
+    user: "{{eap_user}}"
+    job: "{{item.dir}} -name '*.log.*' -type f -mmin +{{item.delete_span}} -delete"
+  with_items: "{{eap_logs}}"

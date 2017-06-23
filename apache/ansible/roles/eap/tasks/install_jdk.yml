@@ -1,0 +1,18 @@
+---
+- name: Download jdk file
+  become: yes
+  get_url:
+    url: "{{jdk_download_url}}"
+    dest: /tmp
+    headers: "Cookie:'oraclelicense=accept-securebackup-cookie'"
+    validate_certs: no
+
+- name: Install jdk
+  become: yes
+  command: "rpm -ivh /tmp/{{jdk_downloaded_file}}"
+
+- name: Remove jdk rpm file
+  become: yes
+  file:
+    path: "/tmp/{{jdk_downloaded_file}}"
+    state: absent

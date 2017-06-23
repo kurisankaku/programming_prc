@@ -1,0 +1,16 @@
+---
+- name: Set init.d jboss-as-standalone.sh
+  become: yes
+  become_user: "{{eap_user}}"
+  template:
+    src: jboss-as-standalone.sh.j2
+    dest: "{{eap_home}}/bin/init.d/jboss-as-standalone.sh"
+  notify: restart eap
+
+- name: Set standalone-ha.xml
+  become: yes
+  become_user: "{{eap_user}}"
+  template:
+    src: standalone-ha.xml.j2
+    dest: "{{eap_home}}/standalone/configuration/standalone-ha.xml"
+  notify: restart eap

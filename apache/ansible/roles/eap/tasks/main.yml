@@ -1,0 +1,31 @@
+---
+- name: Version check
+  shell: java -version
+  register: javaversion
+  ignore_errors: True
+  changed_when: false
+
+- include: install_jdk.yml
+  when: javaversion | failed
+
+- name: Fetch eap home state
+  stat:
+    path: "{{eap_home}}"
+  register: eap_home_state
+  changed_when: false
+
+- include: install.yml
+  when: not eap_home_state.stat.exists
+
+- include: user_group.yml
+
+- include: service.yml
+
+- include: patch_to_server.yml
+  with_items: "{{eap_server_patches}}"
+  loop_control:
+    loop_var: outer_item
+
+- include: settings.yml
+
+- include: crontab.yml

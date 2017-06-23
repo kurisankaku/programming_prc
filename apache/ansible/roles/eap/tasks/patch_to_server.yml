@@ -1,0 +1,28 @@
+---
+- name: Fetch eap server version
+  become: yes
+  shell: "{{eap_home}}/bin/standalone.sh -v 2>&1 | grep -e 'JBoss EAP ' | sed -E 's/^.*6.4.([0-9]+).*/\\1/'"
+  register: eap_version
+  changed_when: false
+
+- block:
+  - name: Download eap patch
+    become: yes
+    get_url:
+      url: "{{outer_item.url}}"
+      dest: /tmp
+
+  - name: Patch to eap server
+    become: yes
+    shell: "{{eap_home}}/bin/jboss-cli.sh -c command='patch apply /tmp/{{outer_item.file_name}}'"
+
+  - name: Restart eap server
+    become: yes
+    shell: "{{eap_home}}/bin/jboss-cli.sh -c command='shutdown --restart=true'"
+
+  - name: Remove eap server zip file
+    become: yes
+    file:
+      path: "/tmp/{{outer_item.file_name}}"
+      state: absent
+  when: eap_version.stdout | int < outer_item.version

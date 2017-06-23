@@ -1,0 +1,31 @@
+---
+jdk_download_url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+jdk_downloaded_file: jdk-8u131-linux-x64.rpm
+java_home: /usr/java/jdk1.8.0_131
+
+eap_server_url : https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.0.zip
+eap_server_zip_file_name: jboss-eap-6.4.0.zip
+eap_unzip_dir_name: jboss-eap-6.4
+
+eap_home: /opt/jboss-eap-6.4
+eap_user: eap
+eap_group: eap
+
+eap_server_patches:
+  - { url: "https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.9-patch.zip", file_name: "jboss-eap-6.4.9-patch.zip", version: 9 }
+  - { url: "https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.10-patch.zip", file_name: "jboss-eap-6.4.10-patch.zip", version: 10 }
+  - { url: "https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.11-patch.zip", file_name: "jboss-eap-6.4.11-patch.zip", version: 11 }
+
+eap_logs:
+  - { dir: "{{eap_home}}/standalone/log/access/", delete_span: "28800" }
+  - { dir: "{{eap_home}}/standalone/log/application/", delete_span: "28800" }
+  - { dir: "{{eap_home}}/standalone/log/server/", delete_span: "28800" }
+#######################
+# standalone-ha.xml.j2
+#######################
+eap_tcp_initial_hosts: "192.168.33.11[7600],192.168.33.12[7600]"
+eap_proxy_list: "192.168.33.11:80,127.0.0.1:80"
+
+######################
+# crontab
+######################

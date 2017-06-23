@@ -1,0 +1,13 @@
+---
+- name: Create eap service file
+  become: yes
+  template:
+    src: eap.service.j2
+    dest: /etc/systemd/system/eap.service
+
+- name: Ensure eap is running and enabled on boot
+  become: yes
+  service:
+    name: eap
+    state: started
+    enabled: yes

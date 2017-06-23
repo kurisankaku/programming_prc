@@ -1,0 +1,4 @@
+---
+- name: restart eap
+  become: yes
+  service: name=eap state=restarted

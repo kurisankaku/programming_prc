@@ -1,0 +1,18 @@
+  [Unit]
+  Description=JBoss EAP Systemctl script
+  After=NetworkManager.service network.target network-online.target remote-fs.target nss-lookup.target
+
+  [Service]
+  Type=forking
+  ExecStart={{eap_home}}/bin/init.d/jboss-as-standalone.sh start
+  ExecStop={{eap_home}}/bin/init.d/jboss-as-standalone.sh stop
+  ExecReload={{eap_home}}/bin/init.d/jboss-as-standalone.sh restart
+  PIDFile=/var/run/jboss-as/jboss-as-standalone.pid
+  # Environment
+  Environment="JAVA_HOME={{java_home}}"
+  Environment="JBOSS_HOME={{eap_home}}"
+  Environment="JBOSS_CONFIG=standalone-ha.xml -b 0.0.0.0 -bmanagement=0.0.0.0"
+  Environment="JBOSS_USER={{eap_user}}"
+
+  [Install]
+  WantedBy=multi-user.target

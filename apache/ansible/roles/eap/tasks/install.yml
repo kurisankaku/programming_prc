@@ -1,0 +1,32 @@
+---
+- name: Download eap server
+  become: yes
+  get_url:
+    url: "{{eap_server_url}}"
+    dest: /tmp
+
+- name: Unzip eap server
+  become: yes
+  command: "unzip -q /tmp/{{eap_server_zip_file_name}} -d /tmp"
+
+- name: Remove eap server zip file
+  become: yes
+  file:
+    path: "/tmp/{{eap_server_zip_file_name}}"
+    state: absent
+
+- name: Make eap home directory
+  become: yes
+  file:
+    path: "{{eap_home}}"
+    state: directory
+
+- name: Move eap unzip files to eap_home directory
+  become: yes
+  shell: "mv /tmp/{{eap_unzip_dir_name}}/* {{eap_home}}/."
+
+- name: Delete eap unzip dir
+  become: yes
+  file:
+    path: "/tmp/{{eap_unzip_dir_name}}"
+    state: absent
