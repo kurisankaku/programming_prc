@@ -20,11 +20,6 @@ eap_logs:
   - { dir: "{{eap_home}}/standalone/log/access/", delete_span: "28800" }
   - { dir: "{{eap_home}}/standalone/log/application/", delete_span: "28800" }
   - { dir: "{{eap_home}}/standalone/log/server/", delete_span: "28800" }
-#######################
-# standalone-ha.xml.j2
-#######################
-eap_tcp_initial_hosts: "192.168.33.11[7600],192.168.33.12[7600]"
-eap_proxy_list: "192.168.33.11:80,127.0.0.1:80"
 
 ######################
 # crontab
