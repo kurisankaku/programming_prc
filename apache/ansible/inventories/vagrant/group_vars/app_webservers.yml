@@ -1,3 +1,4 @@
+---
 eap_home: /opt/jboss-eap-6.4
 ews_home: /opt/jboss-ews-2.1
 
@@ -13,13 +14,6 @@ admin_firewalld_allow_ips:
 # general_firewalld.xml.j2
 #######################
 general_firewalld_allow_ips:
-  - { ip: "192.168.33.0/24" }
-
-#######################
-# fluentd
-# fluentd_firewalld.xml.j2
-#######################
-fluentd_firewalld_allow_ips:
   - { ip: "192.168.33.0/24" }
 
 #######################

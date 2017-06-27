@@ -23,4 +23,4 @@
   template:
     src: td-agent.conf.j2
     dest: /etc/td-agent/td-agent.conf
-  notify: restart td-agetn
+  notify: restart td-agent
