@@ -1,0 +1,26 @@
+---
+- name: Add rpm repository
+  become: yes
+  copy:
+    src: td.repo
+    dest: /etc/yum.repos.d/td.repo
+
+- name: yum install td-agent
+  become: yes
+  yum:
+    name: td-agent
+    state: latest
+
+- name: Ensure td-agent is running and enabled on boot
+  become: yes
+  service:
+    name: td-agent
+    state: started
+    enabled: yes
+
+- name: Set td-agent.conf
+  become: yes
+  template:
+    src: td-agent.conf.j2
+    dest: /etc/td-agent/td-agent.conf
+  notify: restart td-agetn

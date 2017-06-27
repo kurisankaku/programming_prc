@@ -1,0 +1,128 @@
+##############
+# EAP
+##############
+<source>
+  @type tail
+  path {{eap_home}}/standalone/log/access/access.log
+  pos_file /var/log/td-agent/eap_access.pos
+  tag eap.access
+  format ltsv
+</source>
+
+<source>
+  @type tail
+  path {{eap_home}}/standalone/log/application/application.log
+  pos_file /var/log/td-agent/eap_application.pos
+  tag eap.application
+  format ltsv
+</source>
+
+<source>
+  @type tail
+  path {{eap_home}}/standalone/log/server/server.log
+  pos_file /var/log/td-agent/eap_server.pos
+  tag eap.server
+  format ltsv
+</source>
+
+<filter eap.*>
+  @type record_transformer
+  <record>
+    HOST "#{Socket.gethostname}"
+  </record>
+</filter>
+
+<match eap.*>
+  @type forward
+  send_timeout 60s
+  recover_wait 10s
+  heartbeat_interval 1s
+  phi_threshold 16
+  hard_timeout 60s
+
+  <server>
+    name logserver
+    host {{td_agent_logserver_ip}}
+    port 24224
+    weight 60
+  </server>
+
+  <secondary>
+    @type file
+    path /var/log/td-agent/eap/forward-failed
+  </secondary>
+</match>
+
+
+##############
+# httpd
+##############
+
+<source>
+  @type tail
+  path {{ews_home}}/httpd/logs/access_log
+  pos_file /var/log/td-agent/apache_access.pos
+  tag apache.access
+  format apache2
+</source>
+
+<source>
+  @type tail
+  path {{ews_home}}/httpd/logs/error_log
+  pos_file /var/log/td-agent/apache_error.pos
+  tag apache.error
+  format apache_error
+</source>
+
+<filter apache.*>
+  @type record_transformer
+  <record>
+    HOST "#{Socket.gethostname}"
+  </record>
+</filter>
+
+<match apache.*>
+  @type forward
+  send_timeout 60s
+  recover_wait 10s
+  heartbeat_interval 1s
+  phi_threshold 16
+  hard_timeout 60s
+
+  <server>
+    name logserver
+    host {{td_agent_logserver_ip}}
+    port 24224
+    weight 60
+  </server>
+
+  <secondary>
+    @type file
+    path /var/log/td-agent/apache/forward-failed
+  </secondary>
+</match>
+
+##############
+# common
+##############
+
+<match **>
+  @type forward
+  send_timeout 60s
+  recover_wait 10s
+  heartbeat_interval 1s
+  phi_threshold 16
+  hard_timeout 60s
+
+  <server>
+    name logserver
+    host {{td_agent_logserver_ip}}
+    port 24224
+    weight 60
+  </server>
+
+  <secondary>
+    @type file
+    path /var/log/td-agent/fluent/forward-failed
+  </secondary>
+</match>

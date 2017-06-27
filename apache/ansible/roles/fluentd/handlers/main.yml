@@ -1,0 +1,8 @@
+---
+- name: restart firewalld
+  become: yes
+  service: name=firewalld state=restarted
+
+- name: restart td-agent
+  become: yes
+  service: name=td-agent state=restarted

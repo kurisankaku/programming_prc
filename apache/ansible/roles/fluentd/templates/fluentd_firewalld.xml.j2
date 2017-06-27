@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+{% for item in fluentd_firewalld_allow_ips %}
+  <source address="{{item.ip}}"/>
+{% endfor %}
+  <port protocol="tcp" port="24224"/>
+  <port protocol="udp" port="24224"/>
+</zone>

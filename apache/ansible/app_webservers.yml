@@ -1,0 +1,7 @@
+---
+- hosts: app_webservers
+  roles:
+    - common
+    - ews
+    - eap
+    - app_web_settings

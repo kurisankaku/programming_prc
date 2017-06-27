@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <zone>
-{% for item in general_firewalld_ips %}
+{% for item in general_firewalld_allow_ips %}
   <source address="{{item.ip}}"/>
 {% endfor %}
   <service name="http"/>
