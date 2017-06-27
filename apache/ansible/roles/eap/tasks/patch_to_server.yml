@@ -17,8 +17,7 @@
     shell: "{{eap_home}}/bin/jboss-cli.sh -c command='patch apply /tmp/{{outer_item.file_name}}'"
 
   - name: Restart eap server
-    become: yes
-    shell: "{{eap_home}}/bin/jboss-cli.sh -c command='shutdown --restart=true'"
+    include: restart_eap.yml
 
   - name: Remove eap server zip file
     become: yes

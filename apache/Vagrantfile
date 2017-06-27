@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "bento/centos-7.2"
+  config.vm.box = "centos/7"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -53,30 +53,26 @@ Vagrant.configure("2") do |config|
   #
   # View the documentation for the provider you are using for more
   # information on available options.
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+  config.vm.synced_folder ".vagrant", "/vagrant_hidden", type: "rsync"
 
-  config.vm.define :apache do |apache|
-    apache.vm.hostname = "apache"
-    apache.vm.network :private_network, ip: "192.168.33.10"
-  end
-  config.vm.define :app1 do |app1|
-    app1.vm.hostname = "app1"
-    app1.vm.network :private_network, ip: "192.168.33.11"
+  {
+    logserver: "192.168.33.10",
+    app1: "192.168.33.11",
+    app2: "192.168.33.12"
+  }.each do |key, value|
+    config.vm.define key do |item|
+      item.vm.hostname = key.to_s
+      item.vm.network :private_network, ip: value
 
-    app1.vm.provision :ansible_local do |ansible|
-      ansible.playbook       = "./ansible/site.yml"
-      ansible.verbose        = true
-      ansible.install        = true
-      ansible.limit          = "app1"
-      ansible.inventory_path = "./ansible/inventories/vagrant/hosts"
+      item.vm.provision :ansible_local do |ansible|
+        ansible.playbook       = "./ansible/site.yml"
+        ansible.verbose        = true
+        ansible.install        = true
+        ansible.limit          = key.to_s
+        ansible.inventory_path = "./ansible/inventories/vagrant/hosts"
+      end
     end
-  end
-  config.vm.define :app2 do |app2|
-    app2.vm.hostname = "app2"
-    app2.vm.network :private_network, ip: "192.168.33.12"
-  end
-  config.vm.define :log do |log|
-    log.vm.hostname = "log"
-    log.vm.network :private_network, ip: "192.168.33.13"
   end
   # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
   # such as FTP and Heroku are also available. See the documentation at

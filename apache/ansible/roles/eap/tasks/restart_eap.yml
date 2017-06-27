@@ -1,0 +1,7 @@
+---
+- name: stop eap server
+  become: yes
+  service: name=eap state=stopped
+- name: start eap server
+  become: yes
+  service: name=eap state=started
