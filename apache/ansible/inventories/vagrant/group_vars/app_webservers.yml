@@ -21,4 +21,4 @@ general_firewalld_allow_ips:
 # ews
 # td-agent.conf.xml.j2
 #######################
-td_agent_logserver_ip: "192.168.33.13"
+td_agent_logserver_ip: "192.168.33.10"
