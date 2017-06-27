@@ -1,8 +1,4 @@
 ---
-- name: restart eap
-  become: yes
-  service: name=eap state=restarted
-
 - name: restart firewalld
   become: yes
   service: name=firewalld state=restarted

@@ -3,3 +3,4 @@
   roles:
     - common
     - ews
+    - eap_ews_common

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+{% for item in general_firewalld_ips %}
+  <source address="{{item.ip}}"/>
+{% endfor %}
+  <service name="http"/>
+  <service name="https"/>
+  <port protocol="tcp" port="7600"/>
+  <port protocol="tcp" port="8009"/>
+</zone>
