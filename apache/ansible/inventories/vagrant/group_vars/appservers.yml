@@ -8,17 +8,19 @@ ews_home: /opt/jboss-ews-2.1
 #######################
 admin_firewalld_allow_ips:
   - { ip: "10.0.2.2" }
+  - { ip: "192.168.33.1" }
 
 #######################
 # app_websettings
 # general_firewalld.xml.j2
 #######################
 general_firewalld_allow_ips:
-  - { ip: "192.168.33.0/24" }
+  - { ip: "192.168.33.10" }
+  - { ip: "192.168.33.11" }
+  - { ip: "192.168.33.12" }
 
 #######################
-# eap
-# ews
+# app_websettings
 # td-agent.conf.xml.j2
 #######################
 td_agent_logserver_ip: "192.168.33.10"
