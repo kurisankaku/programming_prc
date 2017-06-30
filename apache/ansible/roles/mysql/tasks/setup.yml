@@ -1,0 +1,19 @@
+---
+- name: Uninstall mariadb.
+  yum:
+    name: mariadb-libs
+    state: absent
+
+- name: Install mysql repository
+  yum:
+    name: http://dev.mysql.com/get/mysql57-community-release-el7-7.noarch.rpm
+    state: present
+    validate_certs: yes
+
+- name: Ensure MySQL packages are installed.
+  yum: "name={{ item }} state=installed enablerepo={{ mysql_enablerepo }}"
+  with_items: "{{ mysql_packages }}"
+  register: rh_mysql_install_packages
+
+- name: Ensure MySQL Python libraries are installed.
+  yum: "name=MySQL-python state=installed enablerepo={{ mysql_enablerepo }}"

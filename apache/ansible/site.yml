@@ -1,5 +1,6 @@
 ---
 - include: logservers.yml
+- include: dbservers.yml
 - include: webservers.yml
 - include: appservers.yml
 - include: app_webservers.yml
