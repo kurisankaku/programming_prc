@@ -1,0 +1,4 @@
+---
+- name: install latest unzip module
+  become: yes
+  yum: name=unzip state=latest

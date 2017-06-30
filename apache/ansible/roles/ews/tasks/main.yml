@@ -1,4 +1,6 @@
 ---
+- include: yum.yml
+
 - name: Fetch ews home state
   stat:
     path: "{{ews_home}}"

@@ -2,3 +2,11 @@
 - name: restart ntp
   become: yes
   service: name=ntpd state=restarted
+
+- name: restart firewalld
+  become: yes
+  service: name=firewalld state=restarted
+
+- name: restart td-agent
+  become: yes
+  service: name=td-agent state=restarted

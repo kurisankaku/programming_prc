@@ -1,0 +1,37 @@
+---
+- block:
+  - name: Ensure firewalld is running and enabled on boot
+    become: yes
+    service:
+      name: firewalld
+      state: started
+      enabled: yes
+
+  - name: Accept the specified service. IP is not restricted.
+    become: yes
+    firewalld:
+      permanent: true
+      state: "{{item.state|default(enabled)}}"
+      service: "{{item.service}}"
+    with_items: "{{firewall_services|default([])}}"
+    notify: restart firewalld
+
+  - name: Accept specified port and ip.
+    become: yes
+    firewalld:
+      permanent: true
+      state: "{{item.0.state|default(enabled)}}"
+      rich_rule: "rule family={{item.0.family|default(ipv4)}} port protocol=\"{{item.0.protocol}}\" port=\"{{item.0.port}}\" source address=\"{{item.1}}\" {{item.0.access|default(accept)}}"
+    with_subelements:
+      - "{{firewall_rich_rules|default([])}}"
+      - ip
+    notify: restart firewalld
+  when: ((firewall_rich_rules|default([]))|length > 0) or ((firewall_services|default([]))|length > 0)
+
+- name: Ensure firewalld is stopped and disabled on boot
+  become: yes
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  when: ((firewall_rich_rules|default([]))|length == 0) and ((firewall_services|default([]))|length == 0)

@@ -1,7 +1,23 @@
 ---
-#######################
-# fluentd
-# fluentd_firewalld.xml.j2
-#######################
-fluentd_firewalld_allow_ips:
-  - { ip: "192.168.33.0/24" }
+td_agent_conf_template: td-agent_logserver.conf.j2
+
+firewall_rich_rules:
+  - port: 24224
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
+      - "192.168.33.0/24"
+  - port: 24224
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: udp
+    ip:
+      - "192.168.33.0/24"
+
+td_agent:
+  time_slice_format: "%Y%m%d"
+  time_slice_wait: "10m"
+  time_format: "%Y%m%dT%H%M%S%z"

@@ -2,4 +2,3 @@
 - hosts: logservers
   roles:
     - common
-    - fluentd

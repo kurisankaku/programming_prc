@@ -1,26 +1,51 @@
 ---
+firewall_rich_rules:
+  - port: 80
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
+      - "10.0.2.2"
+      - "192.168.33.1"
+      - "192.168.33.10"
+      - "192.168.33.11"
+  - port: 443
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
+      - "10.0.2.2"
+      - "192.168.33.1"
+      - "192.168.33.10"
+      - "192.168.33.11"
+  - port: 7600
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
+      - "10.0.2.2"
+      - "192.168.33.1"
+      - "192.168.33.10"
+      - "192.168.33.11"
+  - port: 8009
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
+      - "10.0.2.2"
+      - "192.168.33.1"
+      - "192.168.33.10"
+      - "192.168.33.11"
+
+td_agent_conf_template: td-agent_appweb.conf.j2
+
+#######################
+# td-agent_appweb.conf.xml.j2
+#######################
 eap_home: /opt/jboss-eap-6.4
 ews_home: /opt/jboss-ews-2.1
-
-#######################
-# app_webserver_settings
-# admin_firewalld.xml.j2
-#######################
-admin_firewalld_allow_ips:
-  - { ip: "10.0.2.2" }
-  - { ip: "192.168.33.1" }
-
-#######################
-# app_webserver_settings
-# general_firewalld.xml.j2
-#######################
-general_firewalld_allow_ips:
-  - { ip: "192.168.33.10" }
-  - { ip: "192.168.33.11" }
-  - { ip: "192.168.33.12" }
-
-#######################
-# app_webserver_settings
-# td-agent.conf.xml.j2
-#######################
-td_agent_logserver_ip: "192.168.33.10"
+td_agent_logserver_ip: "192.168.33.13"

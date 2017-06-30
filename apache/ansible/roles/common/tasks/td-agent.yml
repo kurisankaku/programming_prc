@@ -1,0 +1,36 @@
+---
+- name: Add rpm repository
+  become: yes
+  copy:
+    src: td.repo
+    dest: /etc/yum.repos.d/td.repo
+
+- name: yum install td-agent
+  become: yes
+  yum:
+    name: td-agent
+    state: latest
+
+- block:
+  - name: Ensure td-agent is running and enabled on boot
+    become: yes
+    service:
+      name: td-agent
+      state: started
+      enabled: yes
+
+  - name: Set td-agent.conf
+    become: yes
+    template:
+      src: "{{td_agent_conf_template}}"
+      dest: /etc/td-agent/td-agent.conf
+    notify: restart td-agent
+  when: ((groups['logservers']|default([]))|length > 0) and (td_agent_conf_template is defined)
+
+- name: Ensure td-agent is stopped and disabled on boot
+  become: yes
+  service:
+    name: td-agent
+    state: stopped
+    enabled: no
+  when: (groups['logservers']|default([]))|length == 0

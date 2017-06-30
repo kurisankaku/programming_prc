@@ -2,7 +2,3 @@
 - name: update yum
   become: yes
   yum: name=* state=latest
-
-- name: install latest unzip module
-  become: yes
-  yum: name=unzip state=latest

@@ -1,4 +1,0 @@
----
-- include: firewalld.yml
-- include: td-agent.yml
-  when: groups['logservers']|length > 0

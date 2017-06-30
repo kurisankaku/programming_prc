@@ -5,6 +5,8 @@
   ignore_errors: True
   changed_when: false
 
+- include: yum.yml
+
 - include: install_jdk.yml
   when: javaversion | failed
 

@@ -1,3 +1,5 @@
 ---
 - include: yum.yml
 - include: ntp.yml
+- include: firewalld.yml
+- include: td-agent.yml
