@@ -1,12 +1,7 @@
 ---
 mysql_users:
   - name: root
-    host: 192.168.33.13
-    password: Abcd1234/
-    priv: "*.*:ALL"
-    state: present
-  - name: root
-    host: 192.168.33.1
+    host: 192.168.33.%
     password: Abcd1234/
     priv: "*.*:ALL"
     state: present
