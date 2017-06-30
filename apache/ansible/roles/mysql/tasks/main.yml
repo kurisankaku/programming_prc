@@ -18,3 +18,4 @@
 - include: databases.yml
 - include: users.yml
 - include: replication.yml
+- include: firewalld.yml
