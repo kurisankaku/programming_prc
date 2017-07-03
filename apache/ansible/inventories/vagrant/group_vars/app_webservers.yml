@@ -1,5 +1,5 @@
 ---
-eap_debug: True
+eap_debug: False
 
 firewall_rich_rules:
   - port: 80
@@ -42,7 +42,15 @@ firewall_rich_rules:
       - "192.168.33.1"
       - "192.168.33.10"
       - "192.168.33.11"
-  - port: 8787
+  - port: 8787 ## For Debug.
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
+      - "10.0.2.2"
+      - "192.168.33.1"
+  - port: 8080 ## For Debug.
     family: ipv4
     state: enabled
     access: accept
