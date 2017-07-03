@@ -28,6 +28,8 @@
   loop_control:
     loop_var: outer_item
 
+- include: install_mysql_jdbc_driver.yml
+
 - include: settings.yml
 
 - include: crontab.yml

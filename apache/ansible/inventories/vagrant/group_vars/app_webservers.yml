@@ -1,4 +1,6 @@
 ---
+eap_debug: True
+
 firewall_rich_rules:
   - port: 80
     family: ipv4
@@ -40,12 +42,32 @@ firewall_rich_rules:
       - "192.168.33.1"
       - "192.168.33.10"
       - "192.168.33.11"
+  - port: 8787
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
+      - "10.0.2.2"
+      - "192.168.33.1"
 
 td_agent_conf_template: td-agent_appweb.conf.j2
 
-#######################
+#############################
+# eap
+# standalone-ha.xml.j2
+#############################
+eap_standalone_ha_datasource:
+  jndi_name: "java:jboss/datasources/GoutApiWchDS"
+  pool_name: "goutapiwch"
+  connection_url: "jdbc:mysql://192.168.33.12:3306/goutapiwchdb"
+  mysql_user_name: root
+  mysql_password: Abcd1234/
+
+#############################
+# common
 # td-agent_appweb.conf.xml.j2
-#######################
+#############################
 eap_home: /opt/jboss-eap-6.4
 ews_home: /opt/jboss-ews-2.1
 td_agent_logserver_ip: "192.168.33.13"

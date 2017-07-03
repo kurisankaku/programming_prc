@@ -3,6 +3,8 @@ jdk_download_url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a
 jdk_downloaded_file: jdk-8u131-linux-x64.rpm
 java_home: /usr/java/jdk1.8.0_131
 
+mysql_connector_java: mysql-connector-java-5.1.42-bin.jar
+
 eap_server_url : https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.0.zip
 eap_server_zip_file_name: jboss-eap-6.4.0.zip
 eap_unzip_dir_name: jboss-eap-6.4
@@ -20,3 +22,4 @@ eap_logs:
   - { dir: "{{eap_home}}/standalone/log/access/", delete_span: "28800" }
   - { dir: "{{eap_home}}/standalone/log/application/", delete_span: "28800" }
   - { dir: "{{eap_home}}/standalone/log/server/", delete_span: "28800" }
+

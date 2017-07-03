@@ -50,7 +50,11 @@ if [ -z "$JBOSS_CONFIG" ]; then
   JBOSS_CONFIG=standalone.xml
 fi
 
+{% if eap_debug|default(False) %}
+JBOSS_SCRIPT="${JBOSS_HOME}/bin/standalone.sh --debug"
+{% else %}
 JBOSS_SCRIPT=$JBOSS_HOME/bin/standalone.sh
+{% endif %}
 
 JBOSS_MARKERFILE=$JBOSS_HOME/standalone/tmp/startup-marker
 

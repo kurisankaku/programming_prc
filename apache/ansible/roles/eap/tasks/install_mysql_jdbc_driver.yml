@@ -1,0 +1,24 @@
+---
+- name: Make mmysql driver directory to modules
+  become: yes
+  file:
+    path: "{{eap_home}}/modules/com/mysql/main"
+    state: directory
+    owner: "{{eap_user}}"
+    group: "{{eap_group}}"
+
+- name: Copy mysql driver to modules directory
+  become: yes
+  copy:
+    src: "{{mysql_connector_java}}"
+    dest: "{{eap_home}}/modules/com/mysql/main/{{mysql_connector_java}}"
+
+- name: Create module.xml to connect mysql driver
+  become: yes
+  template:
+    src: mysql_module.xml.j2
+    dest: "{{eap_home}}/modules/com/mysql/main/module.xml"
+    owner: "{{eap_user}}"
+    group: "{{eap_group}}"
+  notify: restart eap
+

@@ -1,0 +1,15 @@
+---
+- hosts: app_webservers
+  become: yes
+  tasks:
+    - name: Copy ear file to application server
+      copy:
+        src: "{{ear_file_path}}"
+        dest: "/tmp/wch-ear.ear"
+
+    - name: Undeploy ear file
+      shell: "{{eap_home}}/bin/jboss-cli.sh -c command='undeploy wch-ear.ear'"
+      ignore_errors: True
+
+    - name: Deploy ear file
+      shell: "{{eap_home}}/bin/jboss-cli.sh -c command='deploy /tmp/wch-ear.ear'"
