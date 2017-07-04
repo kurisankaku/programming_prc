@@ -42,7 +42,7 @@
 
   <server>
     name logserver
-    host {{td_agent_logserver_ip}}
+    host {{hostvars[groups['logservers'][0]]['ansible_host']}}
     port 24224
     weight 60
   </server>
@@ -91,7 +91,7 @@
 
   <server>
     name logserver
-    host {{td_agent_logserver_ip}}
+    host {{hostvars[groups['logservers'][0]]['ansible_host']}}
     port 24224
     weight 60
   </server>
@@ -116,7 +116,7 @@
 
   <server>
     name logserver
-    host {{td_agent_logserver_ip}}
+    host {{hostvars[groups['logservers'][0]]['ansible_host']}}
     port 24224
     weight 60
   </server>

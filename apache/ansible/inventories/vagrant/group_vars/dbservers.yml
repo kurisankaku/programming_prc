@@ -12,20 +12,20 @@ mysql_users:
 
 # Databases.
 mysql_databases:
-  - name: goutapiwchdb
+  - name: apidb
     collation: utf8mb4_general_ci
     encoding: utf8mb4
-  - name: goutapiwchtestdb
+  - name: apitestdb
     collation: utf8mb4_general_ci
     encoding: utf8mb4
+
+# The default root user installed by mysql - almost always root
+mysql_root_home: /root
+mysql_root_username: root
+mysql_root_password: Abcd1234/
 
 # Set this to the user ansible is logging in as - should have root
 # or sudo access
 mysql_user_home: /root
 mysql_user_name: root
 mysql_user_password: root
-
-# The default root user installed by mysql - almost always root
-mysql_root_home: /root
-mysql_root_username: root
-mysql_root_password: Abcd1234/
