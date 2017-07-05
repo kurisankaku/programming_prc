@@ -8,8 +8,8 @@
         dest: "/tmp/wch-ear.ear"
 
     - name: Undeploy ear file
-      shell: "{{eap_home}}/bin/jboss-cli.sh -c command='undeploy wch-ear.ear'"
+      shell: "/opt/jboss-eap-6.4/bin/jboss-cli.sh -c command='undeploy wch-ear.ear'"
       ignore_errors: True
 
     - name: Deploy ear file
-      shell: "{{eap_home}}/bin/jboss-cli.sh -c command='deploy /tmp/wch-ear.ear'"
+      shell: "/opt/jboss-eap-6.4/bin/jboss-cli.sh -c command='deploy /tmp/wch-ear.ear'"
