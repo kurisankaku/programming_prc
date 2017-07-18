@@ -87,6 +87,7 @@
         <subsystem xmlns="urn:jboss:domain:logging:1.5">
             <console-handler name="CONSOLE">
                 <level name="INFO"/>
+                <encoding value="utf-8"/>
                 <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
@@ -136,14 +137,14 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
-            <logger category="jp.co.mti.gout.api.wch.filter.LogFilter" use-parent-handlers="false">
+            <logger category="com.sample.LogFilter" use-parent-handlers="false">
                 <level name="INFO"/>
                 <handlers>
                     <handler name="CONSOLE"/>
                     <handler name="ACCESS-FILE"/>
                 </handlers>
             </logger>
-            <logger category="jp.co.mti.gout.api.wch" use-parent-handlers="false">
+            <logger category="com.sample" use-parent-handlers="false">
                 <level name="INFO"/>
                 <handlers>
                     <handler name="CONSOLE"/>
@@ -158,6 +159,10 @@
                 </handlers>
             </root-logger>
             <formatter name="PATTERN">
+                {#
+                  If you change this format, you also need to change the "fluentd" log format
+                  (/servers/ansible/roles/common/templates/td-agent_appweb.conf.j2).
+                #}
                 <pattern-formatter pattern="DATE:%d{yyyy/MM/dd HH:mm:ss,SSS}&#x9;LEVEL:%p&#x9;THREAD:%t&#x9;%s%E%n"/>
             </formatter>
         </subsystem>
@@ -462,4 +467,11 @@
             <remote-destination host="localhost" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
+{% if eap_deployment_item is defined %}
+    <deployments>
+        <deployment name="{{eap_deployment_item.name}}" runtime-name="{{eap_deployment_item.runtime_name}}">
+            <content sha1="{{eap_deployment_item.content}}"/>
+        </deployment>
+    </deployments>
+{% endif %}
 </server>

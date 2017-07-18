@@ -29,7 +29,7 @@ sudo yum install unzip
 
 ```
 cd /opt
-sudo wget https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-ews-httpd-2.1.0-RHEL7-x86_64.zip
+sudo wget "jboss-ews-2.1のURL"
 sudo unzip -q jboss-ews-httpd-2.1.0-RHEL7-x86_64.zip
 sudo rm jboss-ews-httpd-2.1.0-RHEL7-x86_64.zip
 ```
@@ -72,7 +72,7 @@ jboss-eap-6.4用のconnectorをダウンロードし、modulesに配置する。
 以下のようにダウンロードし、modulesにコピーする。
 ```
 cd /opt
-sudo wget https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-native-webserver-connectors-6.4.0-RHEL7-x86_64.zip
+sudo wget "connectorのURL"
 sudo unzip -q jboss-eap-native-webserver-connectors-6.4.0-RHEL7-x86_64.zip
 sudo cp -pi jboss-eap-6.4/modules/system/layers/base/native/lib64/httpd/modules/* /opt/jboss-ews-2.1/httpd/modules/.
 sudo rm -rf jboss-eap-6.4

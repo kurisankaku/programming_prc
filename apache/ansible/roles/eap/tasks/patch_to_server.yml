@@ -24,4 +24,4 @@
     file:
       path: "/tmp/{{outer_item.file_name}}"
       state: absent
-  when: eap_version.stdout | int < outer_item.version
+  when: eap_version.stdout != "" and eap_version.stdout | int < outer_item.version

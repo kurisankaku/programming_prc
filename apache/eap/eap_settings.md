@@ -22,20 +22,11 @@ export JAVA_HOME=/usr/java/jdk1.8.0_131
 ### EAP6.4.0とパッチのダウンロード
 下記をダウンロードする。
 
-* [EAP 6.4.0](https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.0.zip)
-* [EAP 6.4.9 Patch](https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.9-patch.zip)
-* [EAP 6.4.10 Patch](https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.10-patch.zip)
-* [EAP 6.4.11 Patch](https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.11-patch.zip)
+* [EAP 6.4.0]()
+* [EAP 6.4.9 Patch]()
+* [EAP 6.4.10 Patch]()
+* [EAP 6.4.11 Patch]()
 
-```
-cd /opt
-sudo wget https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.0.zip
-sudo wget https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.9-patch.zip
-sudo wget https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.10-patch.zip
-sudo wget https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-6.4.11-patch.zip
-sudo unzip -q jboss-eap-6.4.0.zip
-sudo rm jboss-eap-6.4.0.zip
-```
 
 以降、`/opt/jboss-eap-6.4`を`EAP_HOME`と呼びます。
 
@@ -73,11 +64,6 @@ sudo chown -R eap:eap /opt/jboss-eap-6.4
 sudo cp /opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml /opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml.bk
 ```
 
-### ログ設定
-
-`/opt/jboss-eap-6.4/standalone/configuration/standalone-ha.xml`内の `<subsystem xmlns="urn:jboss:domain:logging:1.5">~</subsystem>` を
-`wch/server_config/eap/standalone-ha.xml`内の `<subsystem xmlns="urn:jboss:domain:logging:1.5">~</subsystem>` に置き換え。
-
 #### crontabにログの削除処理を登録
 
 dailyでログローテーションをする場合、古いログを削除する機能はないため、crontabを登録する。
@@ -99,8 +85,6 @@ Serviceに登録し、サーバー起動時にApacheが起動するようにす�
 #### jboss-as-standalone.shの変更
 
 既存の`jboss-as-standalone.sh`を使用してしまうと、ログを２重に記録し続けてしまう。それを防ぐために、修正をする。
-
-`/opt/jboss-eap-6.4/bin/init.d/jboss-as-standalone.sh` を `/wch/server_config/eap/init.d/jboss-as-standalone.sh`の内容にすべて置き換える。
 
 #### Service 作成
 

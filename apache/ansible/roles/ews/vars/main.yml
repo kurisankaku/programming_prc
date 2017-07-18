@@ -1,7 +1,7 @@
 ---
 ews_home: /opt/jboss-ews-2.1
 
-ews_download_url: https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-ews-httpd-2.1.0-RHEL7-x86_64.zip
+ews_download_url: ""
 ews_downloaded_zip_file_name: jboss-ews-httpd-2.1.0-RHEL7-x86_64.zip
 ews_unzip_dir_name: jboss-ews-2.1
 
@@ -9,7 +9,7 @@ unlink_symbolick_link_modules:
   - "{{ews_home}}/httpd/modules/mod_auth_kerb.so"
   - "{{ews_home}}/httpd/conf.d/auth_kerb.conf"
 
-mod_cluster_connector_download_url: https://mtimedsoldevsatmp.blob.core.windows.net/shared/jboss-eap-native-webserver-connectors-6.4.0-RHEL7-x86_64.zip
+mod_cluster_connector_download_url: ""
 mod_cluster_connector_zip_file_name: jboss-eap-native-webserver-connectors-6.4.0-RHEL7-x86_64.zip
 mod_cluster_connector_unzip_dir_name: jboss-eap-6.4
 
@@ -20,3 +20,7 @@ logrotate:
   period: daily
   dateformat: -%Y%m%d
   rotate: 20
+
+ews_ssl_directory_path: "{{ews_home}}/httpd/conf.d/ssl"
+ews_ssl_crt_file_path: "{{ews_ssl_directory_path}}/server.crt"
+ews_ssl_crt_key_file_path: "{{ews_ssl_directory_path}}/server.key"

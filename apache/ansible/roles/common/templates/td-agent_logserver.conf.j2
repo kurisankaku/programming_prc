@@ -14,9 +14,29 @@
   utc
 </match>
 
+<match apache.ssl_access>
+  @type file
+  path /var/log/td-agent/httpd/ssl_access
+  time_slice_format {{td_agent.time_slice_format}}
+  time_slice_wait {{td_agent.time_slice_wait}}
+  time_format {{td_agent.time_format}}
+  compress gzip
+  utc
+</match>
+
 <match apache.error>
   @type file
   path /var/log/td-agent/httpd/error
+  time_slice_format {{td_agent.time_slice_format}}
+  time_slice_wait {{td_agent.time_slice_wait}}
+  time_format {{td_agent.time_format}}
+  compress gzip
+  utc
+</match>
+
+<match apache.ssl_error>
+  @type file
+  path /var/log/td-agent/httpd/ssl_error
   time_slice_format {{td_agent.time_slice_format}}
   time_slice_wait {{td_agent.time_slice_wait}}
   time_format {{td_agent.time_format}}

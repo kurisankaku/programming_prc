@@ -1,5 +1,6 @@
 ---
 eap_debug: False
+isSSL: False
 
 #############################
 # common
@@ -13,8 +14,6 @@ firewall_rich_rules:
     ip:
       - "10.0.2.2"
       - "192.168.33.1"
-      - "192.168.33.10"
-      - "192.168.33.11"
   - port: 443
     family: ipv4
     state: enabled
@@ -23,6 +22,12 @@ firewall_rich_rules:
     ip:
       - "10.0.2.2"
       - "192.168.33.1"
+  - port: 6666
+    family: ipv4
+    state: enabled
+    access: accept
+    protocol: tcp
+    ip:
       - "192.168.33.10"
       - "192.168.33.11"
   - port: 7600
@@ -31,8 +36,6 @@ firewall_rich_rules:
     access: accept
     protocol: tcp
     ip:
-      - "10.0.2.2"
-      - "192.168.33.1"
       - "192.168.33.10"
       - "192.168.33.11"
   - port: 8009
@@ -41,8 +44,6 @@ firewall_rich_rules:
     access: accept
     protocol: tcp
     ip:
-      - "10.0.2.2"
-      - "192.168.33.1"
       - "192.168.33.10"
       - "192.168.33.11"
   - port: 8787 ## For Debug.
@@ -69,8 +70,8 @@ td_agent_conf_template: td-agent_appweb.conf.j2
 # standalone-ha.xml.j2
 #############################
 eap_standalone_ha_datasource:
-  jndi_name: "java:jboss/datasources/GoutApiWchDS"
-  pool_name: "goutapiwch"
-  connection_url: "jdbc:mysql://{{hostvars[groups['dbservers'][0]]['ansible_host']}}:3306/apidb"
-  mysql_user_name: root
+  jndi_name: "java:jboss/datasources/SampleApiDS"
+  pool_name: "sampleapi"
+  connection_url: "jdbc:mysql://{{hostvars[groups['dbservers'][0]]['ansible_host']}}:3306/sampleapidb"
+  mysql_user_name: sampleapi
   mysql_password: Abcd1234/

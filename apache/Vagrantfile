@@ -54,13 +54,12 @@ Vagrant.configure("2") do |config|
   # View the documentation for the provider you are using for more
   # information on available options.
   config.vm.synced_folder ".", "/vagrant", type: "rsync"
-  config.vm.synced_folder ".vagrant", "/vagrant_hidden", type: "rsync"
 
   {
-    logserver: "192.168.33.13",
     dbserver: "192.168.33.12",
+#    logserver: "192.168.33.13",
     app1: "192.168.33.10",
-    app2: "192.168.33.11",
+#    app2: "192.168.33.11",
   }.each do |key, value|
     config.vm.define key do |item|
       item.vm.hostname = key.to_s

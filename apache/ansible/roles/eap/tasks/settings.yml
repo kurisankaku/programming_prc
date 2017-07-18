@@ -7,6 +7,33 @@
     dest: "{{eap_home}}/bin/init.d/jboss-as-standalone.sh"
   notify: restart eap
 
+- name: Fetch deployment_name from standalone-ha.xml
+  become: yes
+  shell: "grep -e '<deployment name=.*>' {{eap_home}}/standalone/configuration/standalone-ha.xml | sed -E 's:.* name=\"(\\S*)\".*>:\\1:'"
+  register: eap_deployment_name
+  changed_when: false
+
+- name: Fetch deployment_runtime_name from standalone-ha.xml
+  become: yes
+  shell: "grep -e '<deployment name=.*>' {{eap_home}}/standalone/configuration/standalone-ha.xml | sed -E 's:.* runtime-name=\"(\\S*)\".*>:\\1:'"
+  register: eap_deployment_runtime_name
+  changed_when: false
+
+- name: Fetch deployment_content from standalone-ha.xml
+  become: yes
+  shell: "grep -e '<content.*/>' {{eap_home}}/standalone/configuration/standalone-ha.xml | sed -E 's:.+sha1=\"(.*)\"/>:\\1:'"
+  register: eap_deployment_content
+  changed_when: false
+
+- name: Set eap_deployment_item
+  set_fact:
+    eap_deployment_item:
+      name: "{{eap_deployment_name.stdout}}"
+      runtime_name: "{{eap_deployment_runtime_name.stdout}}"
+      content: "{{eap_deployment_content.stdout}}"
+  when: eap_deployment_name.stdout != "" and eap_deployment_runtime_name != "" and eap_deployment_content != ""
+  changed_when: false
+
 - name: Set standalone-ha.xml
   become: yes
   become_user: "{{eap_user}}"

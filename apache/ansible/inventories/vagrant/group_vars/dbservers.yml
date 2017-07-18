@@ -4,7 +4,7 @@ firewall_services:
     service: mysql
 
 mysql_users:
-  - name: root
+  - name: sampleapi
     host: 192.168.33.%
     password: Abcd1234/
     priv: "*.*:ALL"
@@ -12,10 +12,10 @@ mysql_users:
 
 # Databases.
 mysql_databases:
-  - name: apidb
+  - name: sampleapidb
     collation: utf8mb4_general_ci
     encoding: utf8mb4
-  - name: apitestdb
+  - name: sampleapitestdb
     collation: utf8mb4_general_ci
     encoding: utf8mb4
 

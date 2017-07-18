@@ -14,7 +14,7 @@
     shell: /sbin/nologin
     createhome: no
 
-- name: Change ews directory owner
+- name: Change eap directory owner
   become: yes
   file:
     recurse: yes

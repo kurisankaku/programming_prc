@@ -1,17 +1,68 @@
 ---
-- name: Add rpm repository
-  become: yes
-  copy:
-    src: td.repo
-    dest: /etc/yum.repos.d/td.repo
-
-- name: yum install td-agent
-  become: yes
-  yum:
-    name: td-agent
-    state: latest
-
 - block:
+  - name: check td-agent exists.
+    shell: /bin/bash -lc "td-agent --version"
+    register: is_td
+    changed_when: false
+    ignore_errors: true
+
+  - name: Increase Max of File Descriptions
+    become: yes
+    lineinfile:
+      dest: /etc/security/limits.conf
+      state: present
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - regexp: "^root soft nofile 65536"
+        line: "root soft nofile 65536"
+      - regexp: "^root hard nofile 65536"
+        line: "root hard nofile 65536"
+      - regexp: "^\\* soft nofile 65536"
+        line: "* soft nofile 65536"
+      - regexp: "^\\* hard nofile 65536"
+        line: "* hard nofile 65536"
+    when: is_td|failed
+
+  - name: Set {{ item.param }}
+    become: yes
+    sysctl:
+      name: "{{ item.param }}"
+      value: "{{ item.value }}"
+      state: present
+    with_items:
+      - param: "net.ipv4.tcp_tw_recycle"
+        value: "1"
+      - param: "net.ipv4.tcp_tw_reuse"
+        value: "1"
+      - param: "net.ipv4.ip_local_port_range"
+        value: "10240 65535"
+    when: is_td|failed
+
+  - name: restart machine
+    shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+    async: 1
+    poll: 0
+    become: yes
+    ignore_errors: true
+    when: (is_td|failed) and ('ansible_connection' not in hostvars[inventory_hostname])
+
+  - name: waiting for server to come back
+    local_action: wait_for host={{ hostvars[inventory_hostname]['ansible_host'] }} port=22 state=started delay=10
+    when: (is_td|failed) and ('ansible_connection' not in hostvars[inventory_hostname])
+
+  - name: Add rpm repository
+    become: yes
+    copy:
+      src: td.repo
+      dest: /etc/yum.repos.d/td.repo
+
+  - name: yum install td-agent
+    become: yes
+    yum:
+      name: td-agent
+      state: latest
+
   - name: Ensure td-agent is running and enabled on boot
     become: yes
     service:
@@ -25,12 +76,12 @@
       src: "{{td_agent_conf_template}}"
       dest: /etc/td-agent/td-agent.conf
     notify: restart td-agent
-  when: ((groups['logservers']|default([]))|length > 0) and (td_agent_conf_template is defined)
 
-- name: Ensure td-agent is stopped and disabled on boot
-  become: yes
-  service:
-    name: td-agent
-    state: stopped
-    enabled: no
-  when: (groups['logservers']|default([]))|length == 0
+  - name: Ensure td-agent is stopped and disabled on boot
+    become: yes
+    service:
+      name: td-agent
+      state: stopped
+      enabled: no
+    when: (groups['logservers']|default([]))|length == 0
+  when: ((groups['logservers']|default([]))|length > 0) and (td_agent_conf_template is defined)

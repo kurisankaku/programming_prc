@@ -20,7 +20,7 @@
   lineinfile:
     dest: "{{ews_home}}/httpd/conf/httpd.conf"
     state: present
-    regexp: "^(.*)ServerTokens OS"
+    regexp: "^.*ServerTokens (OS|Prod)"
     line: "ServerTokens Prod"
   notify: restart httpd
 
@@ -30,7 +30,7 @@
   lineinfile:
     dest: "{{ews_home}}/httpd/conf/httpd.conf"
     state: present
-    regexp: "^(.*)ServerSignature On"
+    regexp: "^.*ServerSignature (On|Off)"
     line: "ServerSignature Off"
   notify: restart httpd
 
@@ -40,7 +40,7 @@
   lineinfile:
     dest: "{{ews_home}}/httpd/conf/httpd.conf"
     state: present
-    regexp: "^(.*)Options Indexes FollowSymLinks"
+    regexp: "^.*Options -?Indexes FollowSymLinks"
     line: "Options -Indexes FollowSymLinks"
   notify: restart httpd
 

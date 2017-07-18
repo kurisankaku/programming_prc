@@ -1,0 +1,18 @@
+app1   ansible_host=
+app2   ansible_host=
+dbserver   ansible_host=
+logserver   ansible_host=
+
+[app_webservers]
+app1
+app2
+
+[appservers]
+
+[webservers]
+
+[logservers]
+logserver
+
+[dbservers]
+dbserver

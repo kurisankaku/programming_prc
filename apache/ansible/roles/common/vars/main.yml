@@ -1,3 +1,8 @@
 ---
 eap_home: /opt/jboss-eap-6.4
 ews_home: /opt/jboss-ews-2.1
+
+td_agent:
+  time_slice_format: "%Y%m%d"
+  time_slice_wait: "10m"
+  time_format: "%Y%m%dT%H%M%S%z"

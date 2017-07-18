@@ -7,10 +7,50 @@
     state: absent
   notify: restart httpd
 
-- name: Generate virtualhost.conf to set server advertise
+- name: Generate mod_cluster_virtualhost.conf to set server advertise
   become: yes
   become_user: "{{ews_user}}"
   template:
-    src: virtualhost.conf.j2
-    dest: "{{ews_home}}/httpd/conf.d/virtualhost.conf"
+    src: mod_cluster_virtualhost.conf.j2
+    dest: "{{ews_home}}/httpd/conf.d/mod_cluster_virtualhost.conf"
   notify: restart httpd
+
+- block:
+  - name: Make ssl directory to store crt and key
+    become: yes
+    file:
+      path: "{{ews_ssl_directory_path}}"
+      state: directory
+
+  - name: Add SSLCertificateFile
+    become: yes
+    copy:
+      src: "{{ssl_crt_file_name}}"
+      dest: "{{ews_ssl_crt_file_path}}"
+    notify: restart httpd
+
+  - name: Add SSLCertificateKeyFile
+    become: yes
+    copy:
+      src: "{{ssl_key_file_name}}"
+      dest: "{{ews_ssl_crt_key_file_path}}"
+    notify: restart httpd
+
+  - name: Set ssl.conf
+    become: yes
+    become_user: "{{ews_user}}"
+    template:
+      src: ssl.conf.j2
+      dest: "{{ews_home}}/httpd/conf.d/ssl.conf"
+    notify: restart httpd
+  when: isSSL | default(True)
+
+- block:
+  - name: Set httpd_virtualhost.conf
+    become: yes
+    become_user: "{{ews_user}}"
+    template:
+      src: httpd_virtualhost.conf.j2
+      dest: "{{ews_home}}/httpd/conf.d/httpd_virtualhost.conf"
+    notify: restart httpd
+  when: not isSSL | default(False)

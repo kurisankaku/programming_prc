@@ -14,7 +14,9 @@
   path {{eap_home}}/standalone/log/application/application.log
   pos_file /var/log/td-agent/eap_application.pos
   tag eap.application
-  format ltsv
+  format multiline
+  format_firstline /^DATE:.*\tLEVEL:/
+  format1 /^DATE:(?<DATE>.*)\tLEVEL:(?<LEVEL>.*)\tTHREAD:(?<THREAD>[^\t]*)\t(?<CONTENT>.*)/
 </source>
 
 <source>
@@ -22,7 +24,9 @@
   path {{eap_home}}/standalone/log/server/server.log
   pos_file /var/log/td-agent/eap_server.pos
   tag eap.server
-  format ltsv
+  format multiline
+  format_firstline /^DATE:.*\tLEVEL:/
+  format1 /^DATE:(?<DATE>.*)\tLEVEL:(?<LEVEL>.*)\tTHREAD:(?<THREAD>[^\t]*)\t(?<CONTENT>.*)/
 </source>
 
 <filter eap.*>
@@ -68,9 +72,25 @@
 
 <source>
   @type tail
+  path {{ews_home}}/httpd/logs/ssl_access_log
+  pos_file /var/log/td-agent/apache_ssl_access.pos
+  tag apache.ssl_access
+  format apache2
+</source>
+
+<source>
+  @type tail
   path {{ews_home}}/httpd/logs/error_log
   pos_file /var/log/td-agent/apache_error.pos
   tag apache.error
+  format apache_error
+</source>
+
+<source>
+  @type tail
+  path {{ews_home}}/httpd/logs/ssl_error_log
+  pos_file /var/log/td-agent/apache_ssl_error.pos
+  tag apache.ssl_error
   format apache_error
 </source>
 
