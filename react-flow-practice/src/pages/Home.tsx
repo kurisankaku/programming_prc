@@ -1,8 +1,21 @@
 import { Link } from "react-router-dom";
 
 const tutorials = [
-  { path: "/tutorial1", title: "Tutorial 1", description: "Basic ReactFlow with Background and Controls" },
-  { path: "/tutorial2", title: "Tutorial 2", description: "Nodes, Edges, and Connections" },
+  {
+    path: "/tutorial1",
+    title: "Tutorial 1",
+    description: "Basic ReactFlow with Background and Controls",
+  },
+  {
+    path: "/tutorial2",
+    title: "Tutorial 2",
+    description: "Nodes, Edges, and Connections",
+  },
+  {
+    path: "/tutorial3",
+    title: "Tutorial 3",
+    description: "Advanced ReactFlow Features",
+  },
 ];
 
 export default function Home() {
@@ -16,7 +29,9 @@ export default function Home() {
             to={tutorial.path}
             className="block p-6 bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
           >
-            <h2 className="text-xl font-semibold text-blue-600">{tutorial.title}</h2>
+            <h2 className="text-xl font-semibold text-blue-600">
+              {tutorial.title}
+            </h2>
             <p className="text-gray-600 mt-2">{tutorial.description}</p>
           </Link>
         ))}

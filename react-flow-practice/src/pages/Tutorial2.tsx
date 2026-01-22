@@ -1,20 +1,33 @@
 import { useCallback } from "react";
 import {
   ReactFlow,
-  useNodesState,
-  useEdgesState,
-  addEdge,
   Background,
   Controls,
+  useEdgesState,
+  useNodesState,
   type Node,
   type Edge,
   type OnConnect,
+  addEdge,
+  SelectionMode,
 } from "@xyflow/react";
 
 const initialNodes: Node[] = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "Node 1" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "Node 2" } },
-  { id: "3", position: { x: 200, y: 50 }, data: { label: "Node 3" } },
+  {
+    id: "1",
+    data: { label: "Node 1" },
+    position: { x: 150, y: 0 },
+  },
+  {
+    id: "2",
+    data: { label: "Node 2" },
+    position: { x: 0, y: 150 },
+  },
+  {
+    id: "3",
+    data: { label: "Node 3" },
+    position: { x: 300, y: 150 },
+  },
 ];
 
 const initialEdges: Edge[] = [
@@ -23,14 +36,13 @@ const initialEdges: Edge[] = [
 ];
 
 export default function Tutorial2() {
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [nodes, _, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
   const onConnect: OnConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
+    (params) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     [setEdges],
   );
-
   return (
     <div className="w-full h-full">
       <ReactFlow
@@ -40,6 +52,10 @@ export default function Tutorial2() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
+        panOnScroll
+        selectionOnDrag
+        panOnDrag={[]}
+        selectionMode={SelectionMode.Partial}
       >
         <Background />
         <Controls />
