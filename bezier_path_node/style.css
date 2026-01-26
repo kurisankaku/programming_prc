@@ -1,0 +1,236 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background-color: #f5f5f5;
+    overflow: hidden;
+}
+
+.canvas {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-color: #fafafa;
+    background-image: 
+        linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* SVGレイヤー */
+.connections-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 接続線のスタイル */
+.connection-path {
+    stroke: #d1d5db;
+    stroke-width: 2;
+    fill: none;
+    transition: stroke 0.2s ease;
+}
+
+.connection-path:hover {
+    stroke: #9ca3af;
+}
+
+/* ノードのスタイル */
+.node {
+    position: absolute;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-width: 240px;
+    cursor: move;
+    user-select: none;
+    z-index: 10;
+    transition: box-shadow 0.2s ease;
+}
+
+.node:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.node.dragging {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+/* ノードヘッダー */
+.node-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    position: relative;
+}
+
+.node-icon {
+    font-size: 20px;
+    margin-right: 8px;
+}
+
+.node-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* ノードコンテンツ */
+.node-content {
+    padding: 12px 16px;
+}
+
+.node-model {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.model-icon {
+    font-size: 16px;
+}
+
+.model-name {
+    font-size: 13px;
+    color: #374151;
+}
+
+.model-type {
+    font-size: 11px;
+    color: #6b7280;
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* アウトプット項目 */
+.node-outputs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.output-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.output-label {
+    font-size: 13px;
+    color: #4b5563;
+}
+
+/* 接続ポイント */
+.connection-point {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+    background: white;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.connection-point::before {
+    content: '+';
+    color: #3b82f6;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.connection-point:hover {
+    background: #3b82f6;
+    transform: scale(1.1);
+}
+
+.connection-point:hover::before {
+    color: white;
+}
+
+.connection-point.connected {
+    background: #3b82f6;
+}
+
+.connection-point.connected::before {
+    content: '';
+}
+
+/* インプット接続ポイント */
+.connection-point.input {
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* アウトプット接続ポイント */
+.connection-point.output {
+    position: relative;
+    margin-left: 8px;
+}
+
+/* 最終ノード */
+.final-node {
+    background: #fffbeb;
+}
+
+.final-node .node-header {
+    background: #fef3c7;
+    border-bottom: 1px solid #fde68a;
+    border-radius: 8px 8px 0 0;
+}
+
+.final-node .node-icon {
+    filter: brightness(1.2);
+}
+
+.node-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.info-icon {
+    font-size: 16px;
+}
+
+/* ドラッグ中の一時的な接続線 */
+.temp-connection {
+    stroke: #3b82f6;
+    stroke-width: 2;
+    stroke-dasharray: 5, 5;
+    fill: none;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* 選択されたノード */
+.node.selected {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}

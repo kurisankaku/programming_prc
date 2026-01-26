@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG ベジェ曲線エディタ</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        svg {
+            border: 1px solid #ddd;
+            display: block;
+            margin: 0 auto;
+            background-color: #fafafa;
+        }
+        
+        .control-point {
+            cursor: grab;
+            transition: r 0.2s;
+        }
+        
+        .control-point:hover {
+            r: 10;
+        }
+        
+        .control-point.dragging {
+            cursor: grabbing;
+        }
+        
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SVG ベジェ曲線エディタ</h1>
+        <svg id="svg-canvas" width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+            <!-- 制御線 -->
+            <line id="control-line-1" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5" />
+            <line id="control-line-2" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5" />
+            
+            <!-- ベジェ曲線 -->
+            <path id="bezier-curve" fill="none" stroke="#007bff" stroke-width="3" />
+            
+            <!-- 制御点 -->
+            <circle id="point-start" class="control-point" r="8" fill="#28a745" stroke="#fff" stroke-width="2" />
+            <circle id="point-control1" class="control-point" r="8" fill="#007bff" stroke="#fff" stroke-width="2" />
+            <circle id="point-control2" class="control-point" r="8" fill="#007bff" stroke="#fff" stroke-width="2" />
+            <circle id="point-end" class="control-point" r="8" fill="#28a745" stroke="#fff" stroke-width="2" />
+        </svg>
+        
+        <div class="controls">
+            <button id="resetBtn">リセット</button>
+        </div>
+        
+        <div class="info">
+            <p><strong>使い方：</strong></p>
+            <ul>
+                <li>青い点（制御点）をドラッグして曲線の形を変更できます</li>
+                <li>緑の点が始点と終点を表します</li>
+                <li>点線が制御線を表示します</li>
+                <li>リセットボタンで初期状態に戻ります</li>
+                <li>SVGベースなので、より滑らかな描画が可能です</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="svg-bezier-editor.js"></script>
+</body>
+</html>

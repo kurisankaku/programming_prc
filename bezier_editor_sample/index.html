@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ベジェ曲線エディタ</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        canvas {
+            border: 1px solid #ddd;
+            display: block;
+            margin: 0 auto;
+            cursor: grab;
+        }
+        
+        canvas:active {
+            cursor: grabbing;
+        }
+        
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ベジェ曲線エディタ</h1>
+        <canvas id="canvas" width="700" height="400"></canvas>
+        
+        <div class="controls">
+            <button id="resetBtn">リセット</button>
+        </div>
+        
+        <div class="info">
+            <p><strong>使い方：</strong></p>
+            <ul>
+                <li>青い点（制御点）をドラッグして曲線の形を変更できます</li>
+                <li>始点と終点、そして2つの制御点で3次ベジェ曲線を形成します</li>
+                <li>リセットボタンで初期状態に戻ります</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="bezier-editor.js"></script>
+</body>
+</html>

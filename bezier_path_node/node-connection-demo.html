@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ノード接続デモ - スムーズな曲線接続</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="canvas" id="canvas">
+        <!-- SVGレイヤー（接続線用） -->
+        <svg class="connections-layer" id="connectionsLayer">
+            <!-- 接続線はここに動的に追加される -->
+        </svg>
+        
+        <!-- ノード1: 質問分類器 -->
+        <div class="node" id="node1" data-node-id="1" style="left: 50px; top: 100px;">
+            <div class="node-header">
+                <span class="node-icon">🔍</span>
+                <span class="node-title">質問分類器</span>
+            </div>
+            <div class="node-content">
+                <div class="node-model">
+                    <span class="model-icon">🤖</span>
+                    <span class="model-name">gpt-3.5-turbo</span>
+                    <span class="model-type">CHAT</span>
+                </div>
+                <div class="node-outputs">
+                    <div class="output-item">
+                        <span class="output-label">クラス1</span>
+                        <button class="connection-point output" data-output="1"></button>
+                    </div>
+                    <div class="output-item">
+                        <span class="output-label">クラス2</span>
+                        <button class="connection-point output" data-output="2"></button>
+                    </div>
+                    <div class="output-item">
+                        <span class="output-label">クラス3</span>
+                        <button class="connection-point output" data-output="3"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ノード2: LLM 2 -->
+        <div class="node" id="node2" data-node-id="2" style="left: 450px; top: 50px;">
+            <div class="node-header">
+                <span class="node-icon">🧠</span>
+                <span class="node-title">LLM 2</span>
+                <button class="connection-point input" data-input="1"></button>
+            </div>
+            <div class="node-content">
+                <div class="node-model">
+                    <span class="model-icon">🤖</span>
+                    <span class="model-name">gpt-3.5-turbo</span>
+                    <span class="model-type">CHAT</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ノード3: LLM 3 -->
+        <div class="node" id="node3" data-node-id="3" style="left: 450px; top: 350px;">
+            <div class="node-header">
+                <span class="node-icon">🧠</span>
+                <span class="node-title">LLM 3</span>
+                <button class="connection-point input" data-input="1"></button>
+            </div>
+            <div class="node-content">
+                <div class="node-model">
+                    <span class="model-icon">🤖</span>
+                    <span class="model-name">gpt-3.5-turbo</span>
+                    <span class="model-type">CHAT</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ノード4: 終了 -->
+        <div class="node final-node" id="node4" data-node-id="4" style="left: 850px; top: 100px;">
+            <div class="node-header">
+                <span class="node-icon">🏁</span>
+                <span class="node-title">終了</span>
+                <button class="connection-point input" data-input="1"></button>
+            </div>
+            <div class="node-content">
+                <div class="node-info">
+                    <span class="info-icon">🔄</span>
+                    <span class="info-text">LLM [x] text</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ノード5: 終了2 -->
+        <div class="node final-node" id="node5" data-node-id="5" style="left: 850px; top: 250px;">
+            <div class="node-header">
+                <span class="node-icon">🏁</span>
+                <span class="node-title">終了 2</span>
+                <button class="connection-point input" data-input="1"></button>
+            </div>
+            <div class="node-content">
+                <div class="node-info">
+                    <span class="info-icon">🔄</span>
+                    <span class="info-text">LLM 2 [x] text</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ノード6: 終了3 -->
+        <div class="node final-node" id="node6" data-node-id="6" style="left: 850px; top: 400px;">
+            <div class="node-header">
+                <span class="node-icon">🏁</span>
+                <span class="node-title">終了 3</span>
+                <button class="connection-point input" data-input="1"></button>
+            </div>
+            <div class="node-content">
+                <div class="node-info">
+                    <span class="info-icon">🔄</span>
+                    <span class="info-text">LLM 3 [x] text</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
