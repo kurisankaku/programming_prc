@@ -7,6 +7,7 @@ import Tutorial1 from "./pages/Tutorial1";
 import Tutorial2 from "./pages/Tutorial2";
 import Tutorial3 from "./pages/Tutorial3";
 import CustomNodes from "./pages/CustomNodes";
+import CustomEdges from "./pages/CustomEdges";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/tutorial2" element={<Tutorial2 />} />
         <Route path="/tutorial3" element={<Tutorial3 />} />
         <Route path="/custom-nodes" element={<CustomNodes />} />
+        <Route path="/custom-edges" element={<CustomEdges />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

@@ -21,6 +21,11 @@ const tutorials = [
     title: "Custom Nodes Tutorial",
     description: "Creating and Using Custom Nodes in ReactFlow",
   },
+  {
+    path: "/custom-edges",
+    title: "Custom Edges Tutorial",
+    description: "Creating and Using Custom Edges in ReactFlow",
+  },
 ];
 
 export default function Home() {
