@@ -16,6 +16,11 @@ const tutorials = [
     title: "Tutorial 3",
     description: "Advanced ReactFlow Features",
   },
+  {
+    path: "/custom-nodes",
+    title: "Custom Nodes Tutorial",
+    description: "Creating and Using Custom Nodes in ReactFlow",
+  },
 ];
 
 export default function Home() {
