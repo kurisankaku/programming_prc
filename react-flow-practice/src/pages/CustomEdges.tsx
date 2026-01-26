@@ -28,13 +28,54 @@ function CustomEdge({
     targetX,
     targetY,
   });
-  console.log("edgePath:", edgePath);
 
   return <BaseEdge id={id} path={edgePath} />;
 }
 
-const edgeTypes = { "custom-edge": CustomEdge };
+function StepEdge({
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  id,
+}: {
+  sourceX: number;
+  sourceY: number;
+  targetX: number;
+  targetY: number;
+  id: string;
+}) {
+  const centerY = (targetY - sourceY) / 2 + sourceY;
+  const edgePath = `M ${sourceX} ${sourceY} L ${sourceX} ${centerY} L ${targetX} ${centerY} L ${targetX} ${targetY}`;
+  return <BaseEdge id={id} path={edgePath} />;
+}
 
+function SigneEdge({
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  id,
+}: {
+  sourceX: number;
+  sourceY: number;
+  targetX: number;
+  targetY: number;
+  id: string;
+}) {
+  const centerX = (targetX - sourceX) / 2 + sourceX;
+  const centerY = (targetY - sourceY) / 2 + sourceY;
+  const edgePath = `M ${sourceX} ${sourceY}
+  Q ${(targetX - sourceX) * 0.2 + sourceX} ${targetY * 1.1} ${centerX} ${centerY}
+  Q ${(targetX - sourceX) * 0.8 + sourceX} ${sourceY * 0.9} ${targetX} ${targetY}`;
+  return <BaseEdge id={id} path={edgePath} />;
+}
+
+const edgeTypes = {
+  "custom-edge": CustomEdge,
+  "step-edge": StepEdge,
+  "signe-edge": SigneEdge,
+};
 const initialNodes: Node[] = [
   {
     id: "1",
@@ -55,7 +96,8 @@ const initialNodes: Node[] = [
 
 const initialEdges: Edge[] = [
   { id: "e1-2", source: "1", target: "2", type: "custom-edge" },
-  { id: "e1-3", source: "1", target: "3" },
+  { id: "e1-3", source: "1", target: "3", type: "step-edge" },
+  { id: "e2-3", source: "2", target: "3", type: "signe-edge" },
 ];
 
 export default function CustomEdges() {
