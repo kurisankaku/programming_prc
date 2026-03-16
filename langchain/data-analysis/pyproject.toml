@@ -1,0 +1,14 @@
+[project]
+name = "data-analysis"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "daytona>=0.151.0",
+    "deepagents>=0.4.11",
+    "langchain-daytona>=0.0.4",
+    "langchain-google-genai>=4.2.1",
+    "langchain-google-vertexai>=3.2.2",
+    "slack-sdk>=3.41.0",
+]
