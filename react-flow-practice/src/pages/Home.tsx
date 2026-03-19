@@ -26,6 +26,11 @@ const tutorials = [
     title: "Custom Edges Tutorial",
     description: "Creating and Using Custom Edges in ReactFlow",
   },
+  {
+    path: "/sub-flows",
+    title: "Sub Flows Tutorial",
+    description: "Implementing Sub Flows in ReactFlow",
+  },
 ];
 
 export default function Home() {

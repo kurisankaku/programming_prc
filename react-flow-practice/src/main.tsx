@@ -8,6 +8,7 @@ import Tutorial2 from "./pages/Tutorial2";
 import Tutorial3 from "./pages/Tutorial3";
 import CustomNodes from "./pages/CustomNodes";
 import CustomEdges from "./pages/CustomEdges";
+import SubFlows from "./pages/SubFlows";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/tutorial3" element={<Tutorial3 />} />
         <Route path="/custom-nodes" element={<CustomNodes />} />
         <Route path="/custom-edges" element={<CustomEdges />} />
+        <Route path="/sub-flows" element={<SubFlows />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

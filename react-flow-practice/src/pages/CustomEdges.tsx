@@ -13,6 +13,8 @@ import {
   getStraightPath,
   type GetStraightPathParams,
   BaseEdge,
+  useReactFlow,
+  EdgeLabelRenderer,
 } from "@xyflow/react";
 
 function CustomEdge({
@@ -22,14 +24,34 @@ function CustomEdge({
   targetY,
   id,
 }: GetStraightPathParams & { id: string }) {
-  const [edgePath] = getStraightPath({
+  const { setEdges } = useReactFlow();
+  const [edgePath, labelX, labelY] = getStraightPath({
     sourceX,
     sourceY,
     targetX,
     targetY,
   });
 
-  return <BaseEdge id={id} path={edgePath} />;
+  return (
+    <>
+      <BaseEdge id={id} path={edgePath} />
+      <EdgeLabelRenderer>
+        <button
+          style={{
+            position: "absolute",
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            pointerEvents: "all",
+          }}
+          className="nodrag nopan"
+          onClick={() => {
+            setEdges((es) => es.filter((e) => e.id !== id));
+          }}
+        >
+          delete
+        </button>
+      </EdgeLabelRenderer>
+    </>
+  );
 }
 
 function StepEdge({
