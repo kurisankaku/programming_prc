@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { useAuthBadge } from "@/hooks/use-auth-effect-demo";
 import { useAuthSession, useCurrentUser } from "@/hooks/use-auth-session";
 import { useAuthProbeStore } from "@/stores/auth-probe-store";
 
@@ -11,6 +12,7 @@ export function SessionLab() {
       <ProbePanel />
       <SessionSummary />
       <NestedDemo />
+      <EffectDemo />
       <LateMountDemo />
     </div>
   );
@@ -166,6 +168,65 @@ function LeafViaNestedHook() {
         value={isLoading ? "取得中" : (user?.email ?? "未ログイン")}
       />
     </div>
+  );
+}
+
+/**
+ * 3 段ネストしたカスタムフックの最深部で、useEffect から認証状態を使う実演。
+ * コンポーネントは useAuthBadge() を呼ぶだけで、props は渡していません。
+ */
+function EffectDemo() {
+  const { settled, awaited } = useAuthBadge();
+
+  const rows = [
+    {
+      label: "宣言的",
+      source: "useEffect が isLoading を見る",
+      log: settled,
+    },
+    {
+      label: "命令的",
+      source: "useEffect の中で await getAuthSession()",
+      log: awaited,
+    },
+  ];
+
+  return (
+    <section>
+      <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
+        ネストしたフックの useEffect から
+      </h2>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-graphite">
+        useAuthBadge() → useAuthAudit() → 最深部のフック、と 3 段重なっています。
+        useAuthSession() はフックなので各フックの先頭で呼び、useEffect
+        の中ではその結果、または getAuthSession() を使います。
+      </p>
+
+      <ul className="mt-6 space-y-2">
+        {rows.map((row) => (
+          <li
+            key={row.label}
+            className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border border-rule p-4"
+          >
+            <div>
+              <p className="text-sm font-semibold">{row.label}</p>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-brass">
+                {row.source}
+              </p>
+            </div>
+            <p className="break-all text-right font-mono text-xs text-graphite">
+              <span className="text-ink">effect {row.log.runs} 回</span>
+              {row.log.entries.length > 0 && (
+                <>
+                  <br />
+                  {row.log.entries.join(" / ")}
+                </>
+              )}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

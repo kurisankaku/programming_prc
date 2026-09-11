@@ -10,6 +10,11 @@ export type UseAuthSessionResult = {
   isLoading: boolean;
   error: unknown;
   isSignedIn: boolean;
+  /**
+   * useEffect やイベントハンドラの中から取りたいときに使います。
+   * 参照は不変なので、依存配列に入れても効果が繰り返し走ることはありません。
+   */
+  getAuthSession: () => Promise<AuthSession>;
   refresh: () => Promise<void>;
 };
 
@@ -27,7 +32,7 @@ export function useAuthSession(): UseAuthSessionResult {
     throw new Error("useAuthSession は AuthSessionProvider の内側で呼んでください。");
   }
 
-  const { status, session, error, load, refresh } = context;
+  const { status, session, error, load, getAuthSession, refresh } = context;
 
   useEffect(() => {
     void load();
@@ -39,6 +44,7 @@ export function useAuthSession(): UseAuthSessionResult {
     isLoading: status === "idle" || status === "loading",
     error,
     isSignedIn: Boolean(session?.tokens),
+    getAuthSession,
     refresh,
   };
 }

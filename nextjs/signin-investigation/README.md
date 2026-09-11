@@ -81,6 +81,42 @@ ProductList（Client Component）
 **「呼んでいる箇所 6 / 取得開始 1 / fetchAuthSession() 実行 1」**、
 「呼び出し箇所を増やす」で 9 まで増やしても後ろ二つは 1 のままです。
 
+### ネストしたカスタムフックから使う
+
+`useAuthSession()` は**フック**です。`useEffect` の中では呼べません（フックのルール違反）。
+フック本体の先頭で呼び、useEffect ではその結果を使ってください。
+
+```ts
+function useMyHook() {
+  const { session, isLoading, isSignedIn } = useAuthSession(); // ← ここで呼ぶ
+
+  useEffect(() => {
+    if (isLoading) return;        // 確定前は null なので待つ
+    doSomething(session);
+  }, [isLoading, isSignedIn, session]);
+}
+```
+
+useEffect やイベントハンドラの中で認証状態そのものが欲しい場合は、`getAuthSession()`
+を await します。取得済みなら通信は起きず、解決済みの Promise がそのまま返ります。
+
+```ts
+function useMyHook() {
+  const { getAuthSession } = useAuthSession();
+
+  useEffect(() => {
+    let active = true;
+    getAuthSession().then((session) => {
+      if (active) doSomething(session);
+    });
+    return () => { active = false; };
+  }, [getAuthSession]);           // 参照は不変なので繰り返し走りません
+}
+```
+
+`/session` の「ネストしたフックの useEffect から」で、3 段ネスト（useAuthBadge →
+useAuthAudit → 最深部）の両パターンが動いていることを確認できます。
+
 ### 副作用として受け入れていること
 
 ヘッダーも境界の内側にあるため、**ページを移動するたびにヘッダーの認証表示も一度「確認中」に戻ります**。
