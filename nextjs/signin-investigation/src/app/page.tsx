@@ -1,69 +1,109 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ProductCard } from "@/components/product-card";
+import { featuredProducts } from "@/data/products";
 
-export default function Home() {
+const promises = [
+  {
+    label: "Repair",
+    title: "直して使う",
+    body: "扱う道具はすべて研ぎ直し・修理を受けます。買い替えではなく、手入れで長く使える道具だけを選んでいます。",
+  },
+  {
+    label: "Origin",
+    title: "作り手が分かる",
+    body: "どの工房の誰が作ったかを言えるものだけを置いています。産地も工程も、聞かれたら答えられます。",
+  },
+  {
+    label: "Fit",
+    title: "手に合わせて選ぶ",
+    body: "店頭では実際に握って、切って、書いてから決められます。通販でも用途を伺って寸法を提案します。",
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      <section className="blueprint-grid bg-blueprint text-paper">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+          <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-brass">
+            Kyoto Nishijin — Est. 2014
           </p>
+
+          <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.15] tracking-tight sm:text-6xl">
+            使うほど、
+            <br className="hidden sm:block" />
+            手に馴染む道具を。
+          </h1>
+
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-paper/75">
+            西陣の町家で、筆記・裁断・計測・収納の道具を扱っています。新品の状態が一番いい道具ではなく、
+            十年使ったときに一番いい道具を置くことにしています。
+          </p>
+
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Link
+              href="/products"
+              className="border border-brass bg-brass px-6 py-3 text-sm font-medium text-blueprint-deep transition-colors hover:bg-transparent hover:text-brass"
+            >
+              道具を見る
+            </Link>
+            <Link
+              href="/about"
+              className="border border-paper/30 px-6 py-3 text-sm text-paper/80 transition-colors hover:border-paper hover:text-paper"
+            >
+              工房のこと
+            </Link>
+          </div>
+
+          <dl className="mt-16 grid max-w-2xl grid-cols-3 gap-px border border-paper/15 bg-paper/15 font-mono text-[11px] uppercase tracking-[0.16em]">
+            {[
+              { term: "取扱", value: "8 点" },
+              { term: "製造", value: "国内" },
+              { term: "研ぎ直し", value: "無期限" },
+            ].map((item) => (
+              <div key={item.term} className="bg-blueprint px-4 py-4">
+                <dt className="text-paper/50">{item.term}</dt>
+                <dd className="mt-1.5 text-sm text-paper">{item.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">三つの約束</h2>
+
+        <ul className="mt-10 grid gap-px border border-rule bg-rule sm:grid-cols-3">
+          {promises.map((promise) => (
+            <li key={promise.title} className="bg-paper p-7">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-brass">
+                {promise.label}
+              </p>
+              <h3 className="mt-4 text-lg font-semibold tracking-tight">{promise.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-graphite">{promise.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="border-t border-rule bg-paper-sunk">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">今月の道具</h2>
+            <Link href="/products" className="text-sm text-brass hover:underline">
+              すべての道具を見る →
+            </Link>
+          </div>
+
+          <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {featuredProducts.map((product) => (
+              <li key={product.id} className="flex">
+                <ProductCard product={product} />
+              </li>
+            ))}
+          </ul>
         </div>
-      </main>
-    </div>
+      </section>
+    </>
   );
 }
