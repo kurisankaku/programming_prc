@@ -9,6 +9,7 @@ const navItems = [
   { href: "/products", label: "道具" },
   { href: "/about", label: "工房" },
   { href: "/session", label: "認証実験" },
+  { href: "/swr-session", label: "SWR比較" },
 ] as const;
 
 export function SiteHeader() {
