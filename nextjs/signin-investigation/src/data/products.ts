@@ -1,20 +1,9 @@
-export type Category = "筆記" | "裁断" | "計測" | "収納";
+import type { Product } from "@/types/product";
 
-export const categories: Category[] = ["筆記", "裁断", "計測", "収納"];
-
-export type Product = {
-  id: string;
-  name: string;
-  reading: string;
-  category: Category;
-  price: number;
-  material: string;
-  size: string;
-  inStock: boolean;
-  blurb: string;
-  featured?: boolean;
-};
-
+/**
+ * サンプルデータ。読むのは MSW のハンドラと、トップの注目商品（サーバー側描画）だけです。
+ * 実際の API に差し替えるときは、ここと src/mocks をまとめて外してください。
+ */
 export const products: Product[] = [
   {
     id: "kg-101",
@@ -112,5 +101,3 @@ export const products: Product[] = [
 ];
 
 export const featuredProducts = products.filter((product) => product.featured);
-
-export const formatPrice = (price: number) => `¥${price.toLocaleString("ja-JP")}`;

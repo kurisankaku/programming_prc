@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ProductList } from "@/components/product-list";
-import { products } from "@/data/products";
 
 export const metadata: Metadata = {
   title: "道具",
@@ -19,7 +18,7 @@ export default function ProductsPage() {
       </header>
 
       <div className="mt-12">
-        <ProductList products={products} />
+        <ProductList />
       </div>
     </div>
   );

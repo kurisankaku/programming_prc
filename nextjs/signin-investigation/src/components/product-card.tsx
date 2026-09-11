@@ -1,4 +1,4 @@
-import { formatPrice, type Product } from "@/data/products";
+import { formatPrice, type Product } from "@/types/product";
 
 /**
  * The card is laid out as a datasheet: a drafting panel on top,
