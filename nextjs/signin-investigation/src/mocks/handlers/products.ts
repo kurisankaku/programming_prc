@@ -5,7 +5,7 @@ import type { ProductListResponse } from "@/types/product";
 /**
  * 実サーバーの代わりに動くハンドラ。絞り込みはここ（= サーバー側）で行います。
  */
-export const handlers = [
+export const productHandlers = [
   http.get("/api/products", async ({ request }) => {
     // ローディング表示を確かめられるよう、わざと遅らせています。
     await delay(300);

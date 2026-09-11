@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { AuthSessionProvider } from "@/providers/auth-session-provider";
 import { SwrProvider } from "@/providers/swr-provider";
 import "./globals.css";
 
@@ -32,9 +33,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ja" className={`${archivo.variable} ${plexMono.variable} h-full`}>
       <body className="flex min-h-full flex-col">
         <SwrProvider>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          {/* ヘッダーも含めて囲むので、ヘッダーとページ内の呼び出しが同じ取得を共有します。 */}
+          <AuthSessionProvider>
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </AuthSessionProvider>
         </SwrProvider>
       </body>
     </html>

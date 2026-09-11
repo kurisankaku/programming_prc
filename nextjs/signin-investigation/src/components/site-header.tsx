@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { HeaderAuth } from "@/components/header-auth";
 
 const navItems = [
   { href: "/", label: "店について" },
   { href: "/products", label: "道具" },
   { href: "/about", label: "工房" },
+  { href: "/session", label: "認証実験" },
 ] as const;
 
 export function SiteHeader() {
@@ -46,6 +48,8 @@ export function SiteHeader() {
             );
           })}
         </nav>
+
+        <HeaderAuth />
       </div>
     </header>
   );
