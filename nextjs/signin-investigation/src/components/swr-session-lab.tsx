@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useSwrAuthSession, useSwrAuthSessionByPath } from "@/hooks/use-swr-auth-session";
+import { SwrBoundaryDemo } from "@/components/swr-boundary-demo";
 import { PageScopedSwrCache } from "@/providers/page-scoped-swr-cache";
 import type { AuthSessionResult } from "@/types/auth-session-result";
 
@@ -29,6 +30,8 @@ export function SwrSessionLab() {
       )}
 
       {shows("own") && <OwnPanel />}
+
+      {shows("boundary") && <SwrBoundaryDemo />}
     </div>
   );
 }
