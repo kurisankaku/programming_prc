@@ -1,46 +1,84 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import useSWR from "swr";
+import { useCallback } from "react";
+import useSWR, { useSWRConfig } from "swr";
 import { fetchAuthSession } from "@/lib/amplify-mock/auth";
 import type { AuthSession } from "@/lib/amplify-mock/types";
+import { registerConsumer } from "@/stores/auth-probe-store";
+import type { AuthSessionResult } from "@/types/auth-session-result";
+import { useEffect } from "react";
 
-export type SwrAuthSessionResult = {
-  session: AuthSession | undefined;
-  isLoading: boolean;
-  isValidating: boolean;
-  error: unknown;
-};
-
-// 実験の変数を絞るため、共通設定（keepPreviousData など）は打ち消しておきます。
-const options = { keepPreviousData: false, revalidateOnFocus: false } as const;
+const SESSION_KEY = "auth/session";
 
 /**
- * 版A：キャッシュキーにページのパスを含める。
- * キャッシュは SWR の global なので、同じパスに戻ると前回の結果が残っています。
+ * SWR 版。Context 版と同じ AuthSessionResult を返します。
+ *
+ * ページ単位の寿命は、このフック単体では作れません。
+ * PageScopedSwrCache（SWRConfig の provider を差し替える層）とセットで使います。
  */
-export function useSwrAuthSessionByPath(): SwrAuthSessionResult {
-  const pathname = usePathname();
+export function useSwrAuthSession(): AuthSessionResult {
+  const { cache } = useSWRConfig();
 
-  const { data, isLoading, isValidating, error } = useSWR<AuthSession>(
-    ["auth/session", pathname],
+  const { data, isLoading, isValidating, error, mutate } = useSWR<AuthSession>(
+    SESSION_KEY,
     () => fetchAuthSession(),
-    options,
+    { keepPreviousData: false, revalidateOnFocus: false },
   );
 
-  return { session: data, isLoading, isValidating, error };
+  useEffect(() => registerConsumer(), []);
+
+  /**
+   * 命令的な取得。SWR には「進行中の取得に相乗りする」公開 API が無いため、
+   * キャッシュを直接覗き、無ければ mutate() で取りにいきます。
+   * 初回取得の最中に呼ばれると、mutate() が二本目の通信を始めます。
+   */
+  const getAuthSession = useCallback(async (): Promise<AuthSession> => {
+    const cached = cache.get(SESSION_KEY)?.data as AuthSession | undefined;
+    if (cached) return cached;
+
+    return (await mutate()) ?? {};
+  }, [cache, mutate]);
+
+  const refresh = useCallback(async () => {
+    await mutate();
+  }, [mutate]);
+
+  return {
+    session: data ?? null,
+    isLoading,
+    isRefreshing: isValidating && data !== undefined,
+    error,
+    isSignedIn: Boolean(data?.tokens),
+    getAuthSession,
+    refresh,
+  };
 }
 
 /**
- * 版B：キーは固定。キャッシュそのものを PageScopedSwrCache が
- * ページごとに作り直すので、毎回まっさらな状態から始まります。
+ * 比較実験のための、うまくいかない方式。
+ * キャッシュキーにパスを含めても、キャッシュ自体は SWR の global に残り続けます。
  */
-export function useSwrAuthSessionScoped(): SwrAuthSessionResult {
-  const { data, isLoading, isValidating, error } = useSWR<AuthSession>(
-    "auth/session",
+export function useSwrAuthSessionByPath(): AuthSessionResult {
+  const pathname = usePathname();
+
+  const { data, isLoading, isValidating, error, mutate } = useSWR<AuthSession>(
+    [SESSION_KEY, pathname],
     () => fetchAuthSession(),
-    options,
+    { keepPreviousData: false, revalidateOnFocus: false },
   );
 
-  return { session: data, isLoading, isValidating, error };
+  const refresh = useCallback(async () => {
+    await mutate();
+  }, [mutate]);
+
+  return {
+    session: data ?? null,
+    isLoading,
+    isRefreshing: isValidating && data !== undefined,
+    error,
+    isSignedIn: Boolean(data?.tokens),
+    getAuthSession: async () => (await mutate()) ?? {},
+    refresh,
+  };
 }

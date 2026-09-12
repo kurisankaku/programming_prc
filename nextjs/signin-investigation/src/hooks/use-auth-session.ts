@@ -2,21 +2,8 @@
 
 import { useContext, useEffect } from "react";
 import { AuthSessionContext } from "@/providers/auth-session-provider";
-import type { AuthSession } from "@/lib/amplify-mock/types";
 import { registerConsumer } from "@/stores/auth-probe-store";
-
-export type UseAuthSessionResult = {
-  session: AuthSession | null;
-  isLoading: boolean;
-  error: unknown;
-  isSignedIn: boolean;
-  /**
-   * useEffect やイベントハンドラの中から取りたいときに使います。
-   * 参照は不変なので、依存配列に入れても効果が繰り返し走ることはありません。
-   */
-  getAuthSession: () => Promise<AuthSession>;
-  refresh: () => Promise<void>;
-};
+import type { AuthSessionResult } from "@/types/auth-session-result";
 
 /**
  * 認証状態の取得口。
@@ -25,7 +12,7 @@ export type UseAuthSessionResult = {
  * 親から状態を受け取る必要はなく、ネストの深さも関係ありません。
  * 実際の取得はページごとに一度だけで、2 人目以降はその結果を共有します。
  */
-export function useAuthSession(): UseAuthSessionResult {
+export function useAuthSession(): AuthSessionResult {
   const context = useContext(AuthSessionContext);
 
   if (!context) {
@@ -41,7 +28,9 @@ export function useAuthSession(): UseAuthSessionResult {
 
   return {
     session,
-    isLoading: status === "idle" || status === "loading",
+    // 手元に結果が無いときだけ true。取り直し中は isRefreshing で表します。
+    isLoading: session === null && status !== "error",
+    isRefreshing: session !== null && status === "loading",
     error,
     isSignedIn: Boolean(session?.tokens),
     getAuthSession,

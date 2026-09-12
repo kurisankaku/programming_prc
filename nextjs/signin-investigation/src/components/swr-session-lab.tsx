@@ -1,71 +1,151 @@
 "use client";
 
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAuthSession } from "@/hooks/use-auth-session";
-import {
-  useSwrAuthSessionByPath,
-  useSwrAuthSessionScoped,
-  type SwrAuthSessionResult,
-} from "@/hooks/use-swr-auth-session";
+import { useSwrAuthSession, useSwrAuthSessionByPath } from "@/hooks/use-swr-auth-session";
 import { PageScopedSwrCache } from "@/providers/page-scoped-swr-cache";
+import type { AuthSessionResult } from "@/types/auth-session-result";
 
+/**
+ * 通信回数を数えたいときは ?only=a / ?only=b / ?only=own で 1 方式だけ描画します。
+ * 三つ同時だと、それぞれの通信が同時に飛んで数が混ざるためです。
+ */
 export function SwrSessionLab() {
+  const only = useSearchParams().get("only");
+  const shows = (name: string) => !only || only === name;
+
   return (
     <div className="space-y-10">
-      <Panel
-        title="版A：キャッシュキーにパスを含める"
-        note='useSWR(["auth/session", pathname])。キャッシュは SWR の global に残ります。'
-        result={useSwrAuthSessionByPath()}
-      />
+      <RequestCounter />
 
-      {/* 版B だけ、独立したキャッシュの内側に置きます。 */}
-      <PageScopedSwrCache>
-        <ScopedPanel />
-      </PageScopedSwrCache>
+      {shows("a") && <ByPathPanel />}
 
-      <OwnPanel />
+      {/* SWR 版は、ページごとに作り直されるキャッシュの内側でのみ成立します。 */}
+      {shows("b") && (
+        <PageScopedSwrCache>
+          <SwrPanel />
+        </PageScopedSwrCache>
+      )}
+
+      {shows("own") && <OwnPanel />}
     </div>
   );
 }
 
-function ScopedPanel() {
+/** このページに来てからの /api/auth/session の通信回数。 */
+function RequestCounter() {
+  const [baseline] = useState(() => countSessionRequests());
+  const [current, setCurrent] = useState(baseline);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrent(countSessionRequests()), 400);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <p className="border border-brass bg-brass/10 px-5 py-3 font-mono text-sm">
+      このページでの /api/auth/session 通信回数: {current - baseline}
+    </p>
+  );
+}
+
+function countSessionRequests(): number {
+  if (typeof performance === "undefined") return 0;
+
+  return performance
+    .getEntriesByType("resource")
+    .filter((entry) => entry.name.includes("/api/auth/session")).length;
+}
+
+function ByPathPanel() {
   return (
     <Panel
-      title="版B：ページごとに新しいキャッシュを与える"
-      note='SWRConfig に provider: () => new Map() を渡し、key={pathname} で作り直します。'
-      result={useSwrAuthSessionScoped()}
+      title="版A：キャッシュキーにパスを含める"
+      note='useSWR(["auth/session", pathname])。キャッシュは SWR の global に残ります。'
+      result={useSwrAuthSessionByPath()}
+      imperative={null}
     />
   );
 }
 
-/** 比較対象。いま採用している自前の仕組み。 */
-function OwnPanel() {
-  const { session, isLoading, error } = useAuthSession();
+function SwrPanel() {
+  const result = useSwrAuthSession();
+  const imperative = useImperativeProbe(result);
 
   return (
     <Panel
-      title="いまの自前版（比較用）"
-      note="Context + useRef の Promise。ページのマウント単位で破棄されます。"
-      result={{ session: session ?? undefined, isLoading, isValidating: false, error }}
+      title="版B：SWR ＋ ページごとの新しいキャッシュ"
+      note="SWRConfig の provider を差し替え、key={pathname} で作り直します。"
+      result={result}
+      imperative={imperative}
     />
   );
+}
+
+function OwnPanel() {
+  const result = useAuthSession();
+  const imperative = useImperativeProbe(result);
+
+  return (
+    <Panel
+      title="Context 版（現行）"
+      note="Context + useRef の Promise。ページのマウント単位で破棄されます。"
+      result={result}
+      imperative={imperative}
+    />
+  );
+}
+
+/**
+ * マウント直後に useEffect から getAuthSession() を呼び、
+ * 余計な通信が増えないかを見ます。
+ */
+function useImperativeProbe(result: AuthSessionResult): string {
+  const { getAuthSession } = result;
+  const [outcome, setOutcome] = useState("待機中");
+
+  useEffect(() => {
+    let active = true;
+    const before = countSessionRequests();
+
+    getAuthSession()
+      .then((session) => {
+        if (!active) return;
+        const added = countSessionRequests() - before;
+        setOutcome(
+          `${session.tokens ? "ログイン済み" : "未ログイン"} / この取得で増えた通信 ${added} 件`,
+        );
+      })
+      .catch(() => {
+        if (active) setOutcome("取得に失敗");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [getAuthSession]);
+
+  return outcome;
 }
 
 function Panel({
   title,
   note,
   result,
+  imperative,
 }: {
   title: string;
   note: string;
-  result: SwrAuthSessionResult;
+  result: AuthSessionResult;
+  imperative: string | null;
 }) {
-  const { session, isLoading, isValidating } = result;
+  const { session, isLoading, isRefreshing } = result;
 
   // このコンポーネントが最初に描画された瞬間の値を、そのまま残します。
   const [firstRender] = useState(() => ({
     isLoading,
-    hasData: session !== undefined,
+    hasData: session !== null,
     signedIn: Boolean(session?.tokens),
   }));
 
@@ -77,14 +157,16 @@ function Panel({
       value: firstRender.hasData ? (firstRender.signedIn ? "ログイン済み" : "未ログイン") : "—",
     },
     { term: "いまの isLoading", value: String(isLoading) },
-    { term: "いまの isValidating", value: String(isValidating) },
+    { term: "いまの isRefreshing", value: String(isRefreshing) },
     {
       term: "いまのログイン状態",
-      value: session === undefined ? "—" : session.tokens ? "ログイン済み" : "未ログイン",
+      value: session === null ? "—" : session.tokens ? "ログイン済み" : "未ログイン",
     },
+    ...(imperative
+      ? [{ term: "useEffect 内の getAuthSession()", value: imperative }]
+      : []),
   ];
 
-  // ご指摘の症状：キャッシュがあるので待たずに、しかも古い値を返してしまう状態。
   const showsStale = !firstRender.isLoading && firstRender.hasData && !firstRender.signedIn;
 
   return (
