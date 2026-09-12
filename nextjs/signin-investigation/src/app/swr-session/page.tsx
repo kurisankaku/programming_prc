@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { SwrSessionLab } from "@/components/swr-session-lab";
 
 export const metadata: Metadata = {
@@ -38,7 +39,10 @@ export default function SwrSessionPage() {
       </header>
 
       <div className="mt-12">
-        <SwrSessionLab />
+        {/* SwrSessionLab は ?only= を読むため、静的プリレンダリングには境界が要ります。 */}
+        <Suspense fallback={<p className="text-sm text-graphite">読み込み中</p>}>
+          <SwrSessionLab />
+        </Suspense>
       </div>
     </div>
   );
