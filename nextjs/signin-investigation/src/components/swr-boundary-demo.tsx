@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { fetchAuthSession } from "@/lib/amplify-mock/auth";
 import type { AuthSession } from "@/lib/amplify-mock/types";
 import { PageScopedSwrCache } from "@/providers/page-scoped-swr-cache";
@@ -24,15 +24,15 @@ export function SwrBoundaryDemo() {
         </p>
       </div>
 
-      <Row label="境界の外" note="SWR の global キャッシュ" />
+      <Row label="境界の外" note="ルートの SwrProvider の下。global キャッシュ" />
 
       <PageScopedSwrCache>
-        <Row label="境界の内" note="SWRConfig の provider が作ったページ専用キャッシュ" />
+        <Row label="境界の内" note="provider が作ったページ専用キャッシュ" />
       </PageScopedSwrCache>
 
       <p className="border-t border-rule px-5 py-3 text-sm leading-relaxed text-graphite">
-        同じキーなのに両方が 1 回ずつ取得していれば、キャッシュは共有されていません。
-        SWR に移行するなら、ヘッダーも含めて認証を使う全員を境界の内側に入れる必要があります。
+        取得回数が両方 1 回なら、キャッシュは共有されていません。
+        一方で「ルートの設定」の行が両方とも同じなら、設定の方は境界を越えて引き継がれています。
       </p>
     </section>
   );
@@ -40,6 +40,9 @@ export function SwrBoundaryDemo() {
 
 function Row({ label, note }: { label: string; note: string }) {
   const [fetches, setFetches] = useState(0);
+
+  // ルートの SwrProvider が入れた設定が、ここまで届いているかを見ます。
+  const { fetcher, keepPreviousData } = useSWRConfig();
 
   const { data, isLoading } = useSWR<AuthSession>(
     "auth/session",
@@ -58,12 +61,18 @@ function Row({ label, note }: { label: string; note: string }) {
         <p className="text-sm font-semibold">{label}</p>
         <p className="font-mono text-[10px] uppercase tracking-widest text-brass">{note}</p>
       </div>
-      <p className="font-mono text-sm">
-        この行の取得 {fetches} 回
-        <span className="ml-3 text-graphite">
-          {isLoading ? "取得中" : data?.tokens ? "ログイン済み" : "未ログイン"}
-        </span>
-      </p>
+      <div className="text-right font-mono text-sm">
+        <p>
+          この行の取得 {fetches} 回
+          <span className="ml-3 text-graphite">
+            {isLoading ? "取得中" : data?.tokens ? "ログイン済み" : "未ログイン"}
+          </span>
+        </p>
+        <p className="mt-1 text-[11px] text-graphite">
+          ルートの設定: fetcher {fetcher ? "あり" : "なし"} / keepPreviousData{" "}
+          {String(keepPreviousData)}
+        </p>
+      </div>
     </div>
   );
 }
