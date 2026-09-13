@@ -12,10 +12,6 @@ export type AuthSessionResult = {
   isRefreshing: boolean;
   error: unknown;
   isSignedIn: boolean;
-  /**
-   * useEffect やイベントハンドラの中から取りたいときに使います。
-   * 参照は不変なので、依存配列に入れても効果が繰り返し走ることはありません。
-   */
-  getAuthSession: () => Promise<AuthSession>;
+  /** キャッシュを捨てて取り直します。ログイン直後などに使います。 */
   refresh: () => Promise<void>;
 };
