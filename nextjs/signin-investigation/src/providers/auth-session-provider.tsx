@@ -6,7 +6,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -47,12 +46,8 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
 function PageAuthSession({ children }: { children: ReactNode }) {
   const [{ session, error, isFetching }, setState] = useState(initialState);
 
-  // StrictMode の二重実行で 2 回取得しないための控え。
-  const pending = useRef<Promise<AuthSession> | null>(null);
-
   useEffect(() => {
-    pending.current ??= fetchAuthSession();
-    settle(pending.current).then(setState);
+    settle(fetchAuthSession()).then(setState);
   }, []);
 
   const refresh = useCallback(async () => {
