@@ -15,11 +15,13 @@ type State = {
 const initialState: State = { session: null, error: null, isFetching: true };
 
 /** 取得の成否を、そのまま描画できる形に畳みます。返る Promise は reject しません。 */
-const settle = (promise: Promise<AuthSession>): Promise<State> =>
-  promise.then(
-    (session) => ({ session, error: null, isFetching: false }),
-    (error: unknown) => ({ session: null, error, isFetching: false }),
-  );
+async function settle(promise: Promise<AuthSession>): Promise<State> {
+  try {
+    return { session: await promise, error: null, isFetching: false };
+  } catch (error) {
+    return { session: null, error, isFetching: false };
+  }
+}
 
 /**
  * 認証状態を、このフックが生きているあいだだけ保持します。
