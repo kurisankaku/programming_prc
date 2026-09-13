@@ -23,25 +23,37 @@ const settle = (promise: Promise<AuthSession>): Promise<State> =>
 
 /**
  * 認証状態を、このフックが生きているあいだだけ保持します。
- * アンマウントすれば取得結果ごと消えるので、次のマウントでは取り直します。
+ * アンマウントすれば ref ごと消えるので、次のマウントでは取り直します。
  */
 export function usePageScopedSession(): AuthSessionResult {
   const [{ session, error, isFetching }, setState] = useState(initialState);
 
-  // StrictMode は effect を 2 回走らせるので、取得を 1 本に保つ控えを置きます。
+  // このマウントで進行中、または解決済みの取得。
   const pending = useRef<Promise<AuthSession> | null>(null);
+
+  /**
+   * 取得を 1 本に保ちます。2 人目以降は同じ Promise を受け取るので、
+   * 解決前なら相乗りし、解決済みなら待たずに値を受け取ります。
+   *
+   * 参照を固定するのは、呼び出し側が依存配列に入れられるようにするためです。
+   * 固定しないと、下の useEffect も毎描画で走り直します。
+   */
+  const getAuthSession = useCallback((): Promise<AuthSession> => {
+    pending.current ??= fetchAuthSession();
+    return pending.current;
+  }, []);
 
   // マウントしたら取りにいきます。呼び出し側は待つだけで済みます。
   useEffect(() => {
-    pending.current ??= fetchAuthSession();
-    settle(pending.current).then(setState);
-  }, []);
+    settle(getAuthSession()).then(setState);
+  }, [getAuthSession]);
 
   const refresh = useCallback(async () => {
+    pending.current = null;
     setState((current) => ({ ...current, isFetching: true }));
 
-    setState(await settle(fetchAuthSession()));
-  }, []);
+    setState(await settle(getAuthSession()));
+  }, [getAuthSession]);
 
   return useMemo(
     () => ({
@@ -51,8 +63,9 @@ export function usePageScopedSession(): AuthSessionResult {
       isLoading: isFetching && session === null,
       isRefreshing: isFetching && session !== null,
       isSignedIn: Boolean(session?.tokens),
+      getAuthSession,
       refresh,
     }),
-    [session, error, isFetching, refresh],
+    [session, error, isFetching, getAuthSession, refresh],
   );
 }
