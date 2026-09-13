@@ -1,7 +1,4 @@
-/**
- * Cognito がトークンを置く場所に相当します。
- * 本物も localStorage を既定の保存先にしています。
- */
+/** Cognito がトークンを置く場所に相当します。本物も既定は localStorage です。 */
 const STORAGE_KEY = "CognitoIdentityServiceProvider.mock.tokens";
 
 export type StoredTokens = {

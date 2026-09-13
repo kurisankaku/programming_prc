@@ -14,7 +14,7 @@ type State = {
 // マウントした時点で取りにいくので、最初から取得中です。
 const initialState: State = { session: null, error: null, isFetching: true };
 
-/** 取得の成否を、そのまま描画できる形に畳みます。返る Promise は reject しません。 */
+/** 成否をまとめて State に畳みます。返る Promise は reject しません。 */
 async function settle(promise: Promise<AuthSession>): Promise<State> {
   try {
     return { session: await promise, error: null, isFetching: false };
@@ -23,17 +23,13 @@ async function settle(promise: Promise<AuthSession>): Promise<State> {
   }
 }
 
-/**
- * 認証状態を、このフックが生きているあいだだけ保持します。
- * アンマウントすれば取得結果ごと消えるので、次のマウントでは取り直します。
- */
+/** 認証状態を、このフックが生きているあいだだけ保持します。 */
 export function usePageScopedSession(): AuthSessionResult {
   const [{ session, error, isFetching }, setState] = useState(initialState);
 
   // StrictMode は effect を 2 回走らせるので、取得を 1 本に保つ控えを置きます。
   const pending = useRef<Promise<AuthSession> | null>(null);
 
-  // マウントしたら取りにいきます。呼び出し側は待つだけで済みます。
   useEffect(() => {
     pending.current ??= fetchAuthSession();
     settle(pending.current).then(setState);
@@ -49,7 +45,6 @@ export function usePageScopedSession(): AuthSessionResult {
     () => ({
       session,
       error,
-      // 手元に結果が無いときだけ true。取り直し中は isRefreshing で表します。
       isLoading: isFetching && session === null,
       isRefreshing: isFetching && session !== null,
       isSignedIn: Boolean(session?.tokens),

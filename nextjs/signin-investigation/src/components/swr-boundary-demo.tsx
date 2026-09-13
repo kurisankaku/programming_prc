@@ -7,9 +7,7 @@ import type { AuthSession } from "@/lib/amplify-mock/types";
 import { PageScopedSwrCache } from "@/providers/page-scoped-swr-cache";
 
 /**
- * 「配下だけ独立」の確認。
- *
- * まったく同じキー "auth/session" を、境界の外と内で 1 回ずつ使います。
+ * 同じキーを境界の外と内で 1 回ずつ使います。
  * キャッシュが共有なら取得は 1 回、別物なら 2 回になります。
  */
 export function SwrBoundaryDemo() {
@@ -48,7 +46,7 @@ function Row({ label, note }: { label: string; note: string }) {
     "auth/session",
     async () => {
       const session = await fetchAuthSession();
-      // フェッチャーの中なので、描画中でも効果の中でもありません。
+      // フェッチャーの中なので、描画中でも effect の中でもありません。
       setFetches((current) => current + 1);
       return session;
     },

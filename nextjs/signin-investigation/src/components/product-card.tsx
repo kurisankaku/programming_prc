@@ -1,9 +1,5 @@
 import { formatPrice, type Product } from "@/types/product";
 
-/**
- * The card is laid out as a datasheet: a drafting panel on top,
- * then the rows a workshop would actually record.
- */
 export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="flex w-full flex-col border border-rule bg-white transition-colors hover:border-brass/60">

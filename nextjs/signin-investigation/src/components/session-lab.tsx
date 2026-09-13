@@ -14,7 +14,6 @@ export function SessionLab() {
   );
 }
 
-/** ページ直下からの呼び出し。 */
 function SessionSummary() {
   const { session, isLoading, isRefreshing, error, isSignedIn, refresh } = useAuthSession();
 
@@ -82,10 +81,7 @@ function SessionSummary() {
   );
 }
 
-/**
- * 入れ子の実演。各階層が親から何も受け取らずに認証状態を取っています。
- * 深さも順番も関係なく、返るのはすべて同じ 1 回の取得結果です。
- */
+/** 各階層が親から何も受け取らずに、同じ取得結果を得ていることの実演。 */
 function NestedDemo() {
   return (
     <section>
@@ -137,10 +133,7 @@ function LeafViaNestedHook() {
   );
 }
 
-/**
- * 取得が終わったあとに現れる呼び出し側。
- * 通信は起きず、最初の描画からすでに認証状態を持っています。
- */
+/** 取得が終わったあとに現れる呼び出し側。通信は起きません。 */
 function LateMountDemo() {
   const [count, setCount] = useState(0);
 

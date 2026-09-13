@@ -9,10 +9,7 @@ export const AuthSessionContext = createContext<AuthSessionResult | null>(null);
 
 /**
  * 認証状態のキャッシュ境界。
- *
- * パスが変わると key が変わって PageAuthSession が丸ごと作り直され、
- * 保持していた取得も結果も破棄されます。つまりキャッシュの寿命は
- * 「このページがマウントされているあいだ」です。
+ * パスが変わると key が変わり、PageAuthSession ごと作り直されて結果が破棄されます。
  */
 export function AuthSessionProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();

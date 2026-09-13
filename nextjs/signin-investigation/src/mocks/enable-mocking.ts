@@ -1,6 +1,6 @@
 /**
- * モック通信の起動。まだ本物の API がないサンプルなので既定で有効です。
- * 実サーバーに繋いだら .env の NEXT_PUBLIC_API_MOCKING を disabled にしてください。
+ * モック通信の起動。本物の API に繋いだら
+ * .env の NEXT_PUBLIC_API_MOCKING を disabled にしてください。
  */
 export const isMockingEnabled = process.env.NEXT_PUBLIC_API_MOCKING === "enabled";
 

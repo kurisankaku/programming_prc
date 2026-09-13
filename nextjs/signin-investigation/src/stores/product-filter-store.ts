@@ -19,10 +19,7 @@ const initialFilters = {
   inStockOnly: false,
 };
 
-/**
- * 一覧の絞り込み条件。この状態から SWR のキーを組み立てるので、
- * 条件が変われば取得もキャッシュも自動で切り替わります。
- */
+/** 一覧の絞り込み条件。この状態から SWR のキーを組み立てます。 */
 export const useProductFilterStore = create<ProductFilterState>()((set) => ({
   ...initialFilters,
   setQuery: (query) => set({ query }),

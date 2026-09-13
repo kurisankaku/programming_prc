@@ -5,11 +5,8 @@ import type { ReactNode } from "react";
 import { SWRConfig } from "swr";
 
 /**
- * 版B の下ごしらえ。
- *
- * SWRConfig に provider を渡すと、その配下だけ独立したキャッシュになります。
- * key={pathname} を付けているので、パスが変わるたびに新しい Map が作られ、
- * 以前のページのキャッシュは引き継がれません。
+ * 配下だけ独立したキャッシュにします。
+ * key でパスごとに作り直されるので、前のページのキャッシュは引き継ぎません。
  */
 export function PageScopedSwrCache({ children }: { children: ReactNode }) {
   const pathname = usePathname();

@@ -1,6 +1,6 @@
 /**
  * aws-amplify/auth の型に合わせた最小構成。
- * 本物へ差し替えるときは、この形のまま import 先だけ変えられます。
+ * 本物へ差し替えるときは import 先を変えるだけで済みます。
  */
 
 export type CognitoJwtPayload = {
@@ -23,10 +23,7 @@ export type AuthTokens = {
   idToken?: JWT;
 };
 
-/**
- * 未ログインでも例外にはならず、tokens が undefined の空セッションが返ります。
- * ログイン判定は `session.tokens !== undefined` で行ってください。
- */
+/** 未ログインでも例外にならず tokens が undefined になります。判定はここで行ってください。 */
 export type AuthSession = {
   tokens?: AuthTokens;
   userSub?: string;

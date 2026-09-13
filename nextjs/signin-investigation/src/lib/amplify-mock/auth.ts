@@ -27,9 +27,8 @@ type SignInResponse = {
 
 /**
  * 本物の fetchAuthSession() の代わり。
- *
- * 本物は有効なトークンが手元にあれば通信しませんが、こちらは呼ばれるたびに
- * 必ず 1 往復します。DevTools の Network で呼び出し回数を数えられるようにするためです。
+ * 本物は有効なトークンがあれば通信しませんが、呼び出し回数を Network タブで
+ * 数えられるよう、こちらは毎回 1 往復します。
  */
 export async function fetchAuthSession(
   options: FetchAuthSessionOptions = {},

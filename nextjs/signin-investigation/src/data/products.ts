@@ -1,8 +1,8 @@
 import type { Product } from "@/types/product";
 
 /**
- * サンプルデータ。読むのは MSW のハンドラと、トップの注目商品（サーバー側描画）だけです。
- * 実際の API に差し替えるときは、ここと src/mocks をまとめて外してください。
+ * サンプルデータ。読むのは MSW のハンドラとトップの注目商品だけです。
+ * 実 API に差し替えるときは、ここと src/mocks をまとめて外します。
  */
 export const products: Product[] = [
   {

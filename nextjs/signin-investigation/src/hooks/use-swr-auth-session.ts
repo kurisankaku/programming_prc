@@ -10,10 +10,8 @@ import type { AuthSessionResult } from "@/types/auth-session-result";
 const SESSION_KEY = "auth/session";
 
 /**
- * SWR 版。Context 版と同じ AuthSessionResult を返します。
- *
- * ページ単位の寿命は、このフック単体では作れません。
- * PageScopedSwrCache（SWRConfig の provider を差し替える層）とセットで使います。
+ * SWR 版。ページ単位の寿命はこのフック単体では作れないので、
+ * PageScopedSwrCache とセットで使います。
  */
 export function useSwrAuthSession(): AuthSessionResult {
   const { data, isLoading, isValidating, error, mutate } = useSWR<AuthSession>(
@@ -36,10 +34,7 @@ export function useSwrAuthSession(): AuthSessionResult {
   };
 }
 
-/**
- * 比較実験のための、うまくいかない方式。
- * キャッシュキーにパスを含めても、キャッシュ自体は SWR の global に残り続けます。
- */
+/** うまくいかない方式。キーにパスを含めても、キャッシュは global に残り続けます。 */
 export function useSwrAuthSessionByPath(): AuthSessionResult {
   const pathname = usePathname();
 

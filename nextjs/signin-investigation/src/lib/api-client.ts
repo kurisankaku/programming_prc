@@ -1,9 +1,6 @@
 import axios from "axios";
 
-/**
- * アプリ内から叩く HTTP クライアント。
- * baseURL を "/api" にしているので、呼び出し側は "/products" のような相対パスを渡します。
- */
+/** アプリ内から叩く HTTP クライアント。呼び出し側は "/products" のような相対パスを渡します。 */
 export const apiClient = axios.create({
   baseURL: "/api",
   timeout: 10_000,
