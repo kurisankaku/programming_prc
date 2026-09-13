@@ -45,30 +45,17 @@ export function usePageScopedSession(): AuthSessionResult {
     return pending.current;
   }, []);
 
-  /**
-   * 取得して state に反映します。
-   *
-   * ただし、待っているあいだに refresh で別の取得が始まっていたら、
-   * こちらは古い結果なので捨てます。反映は解決順ではなく、開始順の最新だけです。
-   */
-  const applyLatest = useCallback(async () => {
-    const promise = getAuthSession();
-    const next = await settle(promise);
-
-    if (pending.current === promise) setState(next);
-  }, [getAuthSession]);
-
   // マウントしたら取りにいきます。呼び出し側は待つだけで済みます。
   useEffect(() => {
-    void applyLatest();
-  }, [applyLatest]);
+    settle(getAuthSession()).then(setState);
+  }, [getAuthSession]);
 
   const refresh = useCallback(async () => {
     pending.current = null;
     setState((current) => ({ ...current, isFetching: true }));
 
-    await applyLatest();
-  }, [applyLatest]);
+    setState(await settle(getAuthSession()));
+  }, [getAuthSession]);
 
   return useMemo(
     () => ({
