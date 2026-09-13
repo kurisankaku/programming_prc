@@ -16,7 +16,7 @@ import { categories, type ProductListResponse } from "@/types/product";
 const filters: CategoryFilter[] = ["すべて", ...categories];
 
 export function ProductList() {
-  // zustand。値ごとに購読して、余計な再描画を避けます。
+  // 値ごとに購読して、余計な再描画を避けます。
   const query = useProductFilterStore((state) => state.query);
   const category = useProductFilterStore((state) => state.category);
   const inStockOnly = useProductFilterStore((state) => state.inStockOnly);
@@ -135,7 +135,7 @@ function Results({
     );
   }
 
-  // 骨組みを出すのは、まだ一度も結果が無い最初の取得のときだけです。
+  // 骨組みを出すのは、まだ一度も結果が無いときだけです。
   if (!data) {
     return <Skeleton />;
   }

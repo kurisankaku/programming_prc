@@ -1,6 +1,6 @@
 import type { AuthSession } from "@/lib/amplify-mock/types";
 
-/** 認証状態を返すフックの共通シグネチャ。Context 版と SWR 版の両方がこれを満たします。 */
+/** 認証状態を返すフックの共通シグネチャ。 */
 export type AuthSessionResult = {
   session: AuthSession | null;
   /** まだ結果が無いときだけ true。 */

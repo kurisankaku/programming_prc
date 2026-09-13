@@ -28,7 +28,6 @@ export const useProductFilterStore = create<ProductFilterState>()((set) => ({
   reset: () => set(initialFilters),
 }));
 
-/** 何か絞り込んでいるか。「絞り込みを外す」の出し分けに使います。 */
 export const selectIsFiltered = (state: ProductFilterState) =>
   state.query.trim() !== "" || state.category !== "すべて" || state.inStockOnly;
 

@@ -21,8 +21,3 @@ export function decodeJWT(token: string): JWT {
     payload: JSON.parse(fromBase64Url(payload)) as CognitoJwtPayload,
   };
 }
-
-/** アクセストークンが期限切れかどうか。 */
-export function isExpired(token: JWT, now = Date.now()): boolean {
-  return token.payload.exp * 1000 <= now;
-}

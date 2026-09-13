@@ -6,10 +6,6 @@ import { useState } from "react";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { signOut } from "@/lib/amplify-mock/auth";
 
-/**
- * ヘッダーの認証表示。
- * ページ内のどの呼び出しとも、同じ 1 回の取得結果を共有しています。
- */
 export function HeaderAuth() {
   const { isLoading, isSignedIn, session, refresh } = useAuthSession();
   const [isSigningOut, setIsSigningOut] = useState(false);

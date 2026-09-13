@@ -81,7 +81,6 @@ function SessionSummary() {
   );
 }
 
-/** 各階層が親から何も受け取らずに、同じ取得結果を得ていることの実演。 */
 function NestedDemo() {
   return (
     <section>
@@ -133,7 +132,6 @@ function LeafViaNestedHook() {
   );
 }
 
-/** 取得が終わったあとに現れる呼び出し側。通信は起きません。 */
 function LateMountDemo() {
   const [count, setCount] = useState(0);
 
