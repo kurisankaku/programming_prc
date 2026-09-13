@@ -40,7 +40,8 @@ function SessionSummary() {
         <button
           type="button"
           onClick={() => void refresh()}
-          disabled={isRefreshing}
+          // 取得中に押せると 2 本が重なり、先に始めた方が後から着いて上書きし得ます。
+          disabled={isLoading || isRefreshing}
           className="text-sm text-brass hover:underline disabled:opacity-50"
         >
           {isRefreshing ? "取り直しています" : "キャッシュを捨てて取り直す"}
