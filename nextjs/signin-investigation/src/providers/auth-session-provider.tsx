@@ -47,7 +47,7 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
 function PageAuthSession({ children }: { children: ReactNode }) {
   const [{ session, error, isFetching }, setState] = useState(initialState);
 
-  // StrictMode は effect を 2 回走らせるので、取得を 1 本に保つ控えを置きます。
+  // StrictMode の二重実行で 2 回取得しないための控え。
   const pending = useRef<Promise<AuthSession> | null>(null);
 
   useEffect(() => {
