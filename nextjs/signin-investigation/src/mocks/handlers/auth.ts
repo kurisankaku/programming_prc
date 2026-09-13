@@ -5,6 +5,7 @@ import { findUserByCredentials, findUserByRefreshToken, toRefreshToken } from "@
 /** Cognito への往復に見立てた待ち時間。 */
 const NETWORK_DELAY_MS = 400;
 
+/** Authorization ヘッダーからトークンを取り出す。無ければ null。 */
 const bearer = (request: Request) =>
   request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ?? null;
 
@@ -37,7 +38,7 @@ export const authHandlers = [
       return HttpResponse.json({ message: "Refresh token is not valid." }, { status: 401 });
     }
 
-    // 毎回その場でトークンを発行し直します（= Cognito のリフレッシュ相当）。
+    // 毎回その場でトークンを発行し直す（= Cognito のリフレッシュ相当）。
     return HttpResponse.json({
       ...issueTokens(user),
       userSub: user.sub,

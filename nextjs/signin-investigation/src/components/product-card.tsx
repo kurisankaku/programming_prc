@@ -1,5 +1,6 @@
 import { formatPrice, type Product } from "@/types/product";
 
+/** 道具 1 点をデータシート風に並べるカード。 */
 export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="flex w-full flex-col border border-rule bg-white transition-colors hover:border-brass/60">

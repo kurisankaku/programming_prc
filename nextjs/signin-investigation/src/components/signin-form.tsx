@@ -7,6 +7,7 @@ import { signIn } from "@/lib/amplify-mock/auth";
 import { AuthError } from "@/lib/amplify-mock/types";
 import { mockUsers } from "@/mocks/users";
 
+/** モック Cognito へのログインフォーム。成功したら実験ページへ送る。 */
 export function SignInForm() {
   const [username, setUsername] = useState(mockUsers[0].username);
   const [password, setPassword] = useState("");
@@ -22,7 +23,7 @@ export function SignInForm() {
 
     try {
       await signIn({ username, password });
-      // 遷移先でページが作り直されるので、そこで新しい認証状態を取り直します。
+      // 遷移先でページが作り直されるので、そこで新しい認証状態を取り直す。
       await refresh();
       router.push("/session");
     } catch (error) {

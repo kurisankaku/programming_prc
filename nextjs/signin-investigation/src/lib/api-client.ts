@@ -1,13 +1,13 @@
 import axios from "axios";
 
-/** アプリ内から叩く HTTP クライアント。呼び出し側は "/products" のような相対パスを渡します。 */
+/** アプリ内から叩く HTTP クライアント。呼び出し側は "/products" のような相対パスを渡す。 */
 export const apiClient = axios.create({
   baseURL: "/api",
   timeout: 10_000,
   headers: { "Content-Type": "application/json" },
 });
 
-/** axios のエラーを、画面に出せる日本語のメッセージに均します。 */
+/** axios のエラーを、画面に出せる日本語のメッセージに均す。 */
 export function toMessage(error: unknown): string {
   if (!axios.isAxiosError(error)) {
     return "予期しないエラーが起きました。";

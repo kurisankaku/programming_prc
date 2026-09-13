@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+/** 全ページ共通のフッター。 */
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-rule bg-paper-sunk">

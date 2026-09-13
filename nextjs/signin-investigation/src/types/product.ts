@@ -21,4 +21,5 @@ export type ProductListResponse = {
   total: number;
 };
 
+/** 価格を日本円の表記にする。 */
 export const formatPrice = (price: number) => `¥${price.toLocaleString("ja-JP")}`;

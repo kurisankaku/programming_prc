@@ -3,11 +3,11 @@ import { products } from "@/data/products";
 import type { ProductListResponse } from "@/types/product";
 
 /**
- * 実サーバーの代わりに動くハンドラ。絞り込みはここ（= サーバー側）で行います。
+ * 実サーバーの代わりに動くハンドラ。絞り込みはここ（= サーバー側）で行う。
  */
 export const productHandlers = [
   http.get("/api/products", async ({ request }) => {
-    // ローディング表示を確かめられるよう、わざと遅らせています。
+    // ローディング表示を確かめられるよう、わざと遅らせている。
     await delay(300);
 
     const params = new URL(request.url).searchParams;

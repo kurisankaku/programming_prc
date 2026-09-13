@@ -1,4 +1,4 @@
-/** Cognito がトークンを置く場所に相当します。本物も既定は localStorage です。 */
+/** Cognito がトークンを置く場所に相当する。本物も既定は localStorage。 */
 const STORAGE_KEY = "CognitoIdentityServiceProvider.mock.tokens";
 
 export type StoredTokens = {
@@ -7,6 +7,7 @@ export type StoredTokens = {
   refreshToken: string;
 };
 
+/** 保存済みのトークン。無いか壊れていれば null。 */
 export function readTokens(): StoredTokens | null {
   if (typeof window === "undefined") return null;
 
@@ -18,11 +19,13 @@ export function readTokens(): StoredTokens | null {
   }
 }
 
+/** トークンを保存する。 */
 export function writeTokens(tokens: StoredTokens): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
 }
 
+/** 保存済みのトークンを捨てる。 */
 export function clearTokens(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(STORAGE_KEY);

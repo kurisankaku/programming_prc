@@ -15,8 +15,9 @@ import { categories, type ProductListResponse } from "@/types/product";
 
 const filters: CategoryFilter[] = ["すべて", ...categories];
 
+/** 道具の一覧。絞り込み条件は zustand、取得は SWR が持つ。 */
 export function ProductList() {
-  // 値ごとに購読して、余計な再描画を避けます。
+  // 値ごとに購読して、余計な再描画を避ける。
   const query = useProductFilterStore((state) => state.query);
   const category = useProductFilterStore((state) => state.category);
   const inStockOnly = useProductFilterStore((state) => state.inStockOnly);
@@ -29,13 +30,13 @@ export function ProductList() {
   const debouncedQuery = useDebouncedValue(query);
   const mocksReady = useMocksReady();
 
-  // 条件が SWR のキーになるので、同じ条件に戻ればキャッシュから即座に描画されます。
+  // 条件が SWR のキーになるので、同じ条件に戻ればキャッシュから即座に描画される。
   const key = mocksReady
     ? buildProductsKey({ query: debouncedQuery, category, inStockOnly })
     : null;
 
   const { data, error, isValidating, mutate } = useSWR<ProductListResponse>(key);
-  // keepPreviousData により、条件を変えても前の結果を保ったまま取得し直します。
+  // keepPreviousData により、条件を変えても前の結果を保ったまま取得し直す。
   const isRefreshing = Boolean(data) && isValidating;
 
   return (
@@ -108,6 +109,7 @@ export function ProductList() {
   );
 }
 
+/** 取得結果の描画。失敗・初回取得・0 件・一覧を出し分ける。 */
 function Results({
   data,
   error,
@@ -135,7 +137,7 @@ function Results({
     );
   }
 
-  // 骨組みを出すのは、まだ一度も結果が無いときだけです。
+  // 骨組みを出すのは、まだ一度も結果が無いときだけ。
   if (!data) {
     return <Skeleton />;
   }
@@ -172,6 +174,7 @@ function Results({
   );
 }
 
+/** 初回取得のあいだ出す骨組み。 */
 function Skeleton() {
   return (
     <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-hidden>
@@ -182,6 +185,7 @@ function Skeleton() {
   );
 }
 
+/** 一覧の代わりに出す案内。失敗時と 0 件のときに使う。 */
 function Notice({
   title,
   body,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-/** 入力のたびに取得が走らないよう、値の反映を少し遅らせます。 */
+/** 入力のたびに取得が走らないよう、値の反映を少し遅らせる。 */
 export function useDebouncedValue<T>(value: T, delayMs = 250): T {
   const [debounced, setDebounced] = useState(value);
 

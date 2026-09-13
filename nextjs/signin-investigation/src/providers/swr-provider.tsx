@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { SWRConfig } from "swr";
 import { fetcher } from "@/lib/fetcher";
 
-/** SWR の既定設定。フェッチャーをここで一度だけ渡します。 */
+/** SWR の既定設定。フェッチャーをここで一度だけ渡す。 */
 export function SwrProvider({ children }: { children: ReactNode }) {
   return (
     <SWRConfig

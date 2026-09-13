@@ -6,7 +6,7 @@ import type { AuthSessionResult } from "@/types/auth-session-result";
 
 /**
  * 認証状態の取得口。
- * どこから何度呼んでも、ページごとに一度きりの取得結果を共有します。
+ * どこから何度呼んでも、ページごとに一度きりの取得結果を共有する。
  */
 export function useAuthSession(): AuthSessionResult {
   const value = useContext(AuthSessionContext);
@@ -18,7 +18,7 @@ export function useAuthSession(): AuthSessionResult {
   return value;
 }
 
-/** ID トークンから現在のユーザーを取り出します。 */
+/** ID トークンから現在のユーザーを取り出す。 */
 export function useCurrentUser() {
   const { session, isLoading, error } = useAuthSession();
   const payload = session?.tokens?.idToken?.payload;

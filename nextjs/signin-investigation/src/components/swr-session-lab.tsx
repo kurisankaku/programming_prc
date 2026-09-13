@@ -9,8 +9,8 @@ import { PageScopedSwrCache } from "@/providers/page-scoped-swr-cache";
 import type { AuthSessionResult } from "@/types/auth-session-result";
 
 /**
- * 通信回数を数えたいときは ?only=a / ?only=b / ?only=own で 1 方式だけ描画します。
- * 三つ同時だと、それぞれの通信が同時に飛んで数が混ざるためです。
+ * 通信回数を数えたいときは ?only=a / ?only=b / ?only=own で 1 方式だけ描画する。
+ * 三つ同時だと、それぞれの通信が同時に飛んで数が混ざるため。
  */
 export function SwrSessionLab() {
   const only = useSearchParams().get("only");
@@ -34,6 +34,7 @@ export function SwrSessionLab() {
   );
 }
 
+/** 版A。キャッシュキーにパスを含める方式。 */
 function ByPathPanel() {
   return (
     <Panel
@@ -44,6 +45,7 @@ function ByPathPanel() {
   );
 }
 
+/** 版B。ページごとに新しいキャッシュを与える方式。 */
 function SwrPanel() {
   return (
     <Panel
@@ -54,6 +56,7 @@ function SwrPanel() {
   );
 }
 
+/** 現行の Context 版。比較の基準。 */
 function OwnPanel() {
   return (
     <Panel
@@ -64,6 +67,7 @@ function OwnPanel() {
   );
 }
 
+/** 1 方式ぶんの計測結果。初回レンダーの値を残して比べる。 */
 function Panel({
   title,
   note,
@@ -75,7 +79,7 @@ function Panel({
 }) {
   const { session, isLoading } = result;
 
-  // このコンポーネントが最初に描画された瞬間の値を、そのまま残します。
+  // このコンポーネントが最初に描画された瞬間の値を、そのまま残す。
   const [firstRender] = useState(() => ({
     isLoading,
     hasData: session !== null,

@@ -1,4 +1,4 @@
-/** モックの Cognito ユーザープール。実験用の固定アカウントです。 */
+/** モックの Cognito ユーザープール。実験用の固定アカウント。 */
 export type MockUser = {
   sub: string;
   username: string;
@@ -24,11 +24,13 @@ export const mockUsers: MockUser[] = [
   },
 ];
 
+/** 資格情報が一致するユーザー。無ければ undefined。 */
 export const findUserByCredentials = (username: string, password: string) =>
   mockUsers.find((user) => user.username === username && user.password === password);
 
-/** 実物のリフレッシュトークンは不透明な文字列ですが、ここは引けるようにしてあります。 */
+/** 実物のリフレッシュトークンは不透明な文字列だが、ここは引けるようにしてある。 */
 export const toRefreshToken = (user: MockUser) => `mock-refresh.${user.sub}`;
 
+/** リフレッシュトークンの持ち主。無ければ undefined。 */
 export const findUserByRefreshToken = (refreshToken: string | null) =>
   mockUsers.find((user) => toRefreshToken(user) === refreshToken);

@@ -12,6 +12,7 @@ const navItems = [
   { href: "/swr-session", label: "SWR比較" },
 ] as const;
 
+/** 全ページ共通のヘッダー。現在地の下線と認証表示を持つ。 */
 export function SiteHeader() {
   const pathname = usePathname();
 

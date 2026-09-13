@@ -11,7 +11,7 @@ const SESSION_KEY = "auth/session";
 
 /**
  * SWR 版。ページ単位の寿命はこのフック単体では作れないので、
- * PageScopedSwrCache とセットで使います。
+ * PageScopedSwrCache とセットで使う。
  */
 export function useSwrAuthSession(): AuthSessionResult {
   const { data, isLoading, error, mutate } = useSWR<AuthSession>(
@@ -33,7 +33,7 @@ export function useSwrAuthSession(): AuthSessionResult {
   };
 }
 
-/** うまくいかない方式。キーにパスを含めても、キャッシュは global に残り続けます。 */
+/** うまくいかない方式。キーにパスを含めても、キャッシュは global に残り続ける。 */
 export function useSwrAuthSessionByPath(): AuthSessionResult {
   const pathname = usePathname();
 

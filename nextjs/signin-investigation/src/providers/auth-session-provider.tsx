@@ -21,10 +21,10 @@ type State = {
   isLoading: boolean;
 };
 
-// マウントした時点で取りにいくので、最初から取得中です。
+// マウント時点で取りにいくので、最初から取得中。
 const initialState: State = { session: null, error: null, isLoading: true };
 
-/** 成否をまとめて State に畳みます。返る Promise は reject しません。 */
+/** 成否をまとめて State に畳む。返る Promise は reject しない。 */
 async function settle(promise: Promise<AuthSession>): Promise<State> {
   try {
     return { session: await promise, error: null, isLoading: false };
@@ -35,7 +35,7 @@ async function settle(promise: Promise<AuthSession>): Promise<State> {
 
 /**
  * 認証状態のキャッシュ境界。
- * パスが変わると key が変わり、PageAuthSession ごと作り直されて結果が破棄されます。
+ * パスが変わると key が変わり、PageAuthSession ごと作り直されて結果が破棄される。
  */
 export function AuthSessionProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -43,6 +43,7 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
   return <PageAuthSession key={pathname}>{children}</PageAuthSession>;
 }
 
+/** 認証状態を保持して Context で配る。破棄の単位はこのコンポーネント。 */
 function PageAuthSession({ children }: { children: ReactNode }) {
   const [{ session, error, isLoading }, setState] = useState(initialState);
 

@@ -1,6 +1,6 @@
 /**
  * aws-amplify/auth の型に合わせた最小構成。
- * 本物へ差し替えるときは import 先を変えるだけで済みます。
+ * 本物へ差し替えるときは import 先を変えるだけで済む。
  */
 
 export type CognitoJwtPayload = {
@@ -12,7 +12,7 @@ export type CognitoJwtPayload = {
   "cognito:username"?: string;
 };
 
-/** 本物の JWT と同じく、文字列化と復号済みペイロードの両方を持ちます。 */
+/** 本物の JWT と同じく、文字列化と復号済みペイロードの両方を持つ。 */
 export type JWT = {
   toString: () => string;
   payload: CognitoJwtPayload;
@@ -23,7 +23,7 @@ export type AuthTokens = {
   idToken?: JWT;
 };
 
-/** 未ログインでも例外にならず tokens が undefined になります。判定はここで行ってください。 */
+/** 未ログインでも例外にならず tokens が undefined になる。ログイン判定はこれで行う。 */
 export type AuthSession = {
   tokens?: AuthTokens;
   userSub?: string;
@@ -49,7 +49,7 @@ export type AuthUser = {
   username: string;
 };
 
-/** 本物の AuthError と同じく、name で種類を見分けます。 */
+/** 本物の AuthError と同じく、name で種類を見分ける。 */
 export class AuthError extends Error {
   constructor(
     public override readonly name: string,

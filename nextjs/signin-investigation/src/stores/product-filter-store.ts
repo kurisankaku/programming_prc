@@ -19,7 +19,7 @@ const initialFilters = {
   inStockOnly: false,
 };
 
-/** 一覧の絞り込み条件。この状態から SWR のキーを組み立てます。 */
+/** 一覧の絞り込み条件。この状態から SWR のキーを組み立てる。 */
 export const useProductFilterStore = create<ProductFilterState>()((set) => ({
   ...initialFilters,
   setQuery: (query) => set({ query }),
@@ -28,10 +28,11 @@ export const useProductFilterStore = create<ProductFilterState>()((set) => ({
   reset: () => set(initialFilters),
 }));
 
+/** 何か絞り込んでいるか。 */
 export const selectIsFiltered = (state: ProductFilterState) =>
   state.query.trim() !== "" || state.category !== "すべて" || state.inStockOnly;
 
-/** 絞り込み条件を API のクエリ文字列に変換します。 */
+/** 絞り込み条件を API のクエリ文字列に変換する。 */
 export function buildProductsKey(filters: {
   query: string;
   category: CategoryFilter;

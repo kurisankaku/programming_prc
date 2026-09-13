@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { signOut } from "@/lib/amplify-mock/auth";
 
+/** ヘッダー右端。未ログインならログインへの導線、ログイン済みならログアウト。 */
 export function HeaderAuth() {
   const { isLoading, isSignedIn, session, refresh } = useAuthSession();
   const [isSigningOut, setIsSigningOut] = useState(false);

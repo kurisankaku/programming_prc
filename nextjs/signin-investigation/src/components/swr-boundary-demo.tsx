@@ -7,8 +7,8 @@ import type { AuthSession } from "@/lib/amplify-mock/types";
 import { PageScopedSwrCache } from "@/providers/page-scoped-swr-cache";
 
 /**
- * 同じキーを境界の外と内で 1 回ずつ使います。
- * キャッシュが共有なら取得は 1 回、別物なら 2 回になります。
+ * 同じキーを境界の外と内で 1 回ずつ使う。
+ * キャッシュが共有なら取得は 1 回、別物なら 2 回になる。
  */
 export function SwrBoundaryDemo() {
   return (
@@ -36,17 +36,18 @@ export function SwrBoundaryDemo() {
   );
 }
 
+/** 境界の内か外か 1 行ぶん。取得回数とルートの設定が届いているかを出す。 */
 function Row({ label, note }: { label: string; note: string }) {
   const [fetches, setFetches] = useState(0);
 
-  // ルートの SwrProvider が入れた設定が、ここまで届いているかを見ます。
+  // ルートの SwrProvider が入れた設定が、ここまで届いているかを見る。
   const { fetcher, keepPreviousData } = useSWRConfig();
 
   const { data, isLoading } = useSWR<AuthSession>(
     "auth/session",
     async () => {
       const session = await fetchAuthSession();
-      // フェッチャーの中なので、描画中でも effect の中でもありません。
+      // フェッチャーの中なので、描画中でも effect の中でもない。
       setFetches((current) => current + 1);
       return session;
     },

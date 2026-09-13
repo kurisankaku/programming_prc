@@ -27,18 +27,18 @@ type SignInResponse = {
 
 /**
  * 本物の fetchAuthSession() の代わり。
- * 本物は有効なトークンがあれば通信しませんが、呼び出し回数を Network タブで
- * 数えられるよう、こちらは毎回 1 往復します。
+ * 本物は有効なトークンがあれば通信しないが、呼び出し回数を Network タブで
+ * 数えられるよう、こちらは毎回 1 往復する。
  */
 export async function fetchAuthSession(
   options: FetchAuthSessionOptions = {},
 ): Promise<AuthSession> {
-  // モック専用。本物に差し替えるときはこの行ごと消えます。
+  // モック専用。本物に差し替えるときはこの行ごと消える。
   await enableMocking();
 
   const stored = readTokens();
 
-  // 未ログインは例外ではなく空のセッション。本物と同じ振る舞いです。
+  // 未ログインは例外ではなく空のセッション。本物と同じ振る舞い。
   if (!stored) return {};
 
   try {
@@ -58,7 +58,7 @@ export async function fetchAuthSession(
       identityId: data.identityId,
     };
   } catch (error) {
-    // 期限切れや取り消し済みのトークンは、捨てて未ログイン扱いに戻します。
+    // 期限切れや取り消し済みのトークンは、捨てて未ログイン扱いに戻す。
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       clearTokens();
       return {};
@@ -67,6 +67,7 @@ export async function fetchAuthSession(
   }
 }
 
+/** 本物の signIn() の代わり。成功したらトークンを localStorage に置く。 */
 export async function signIn({ username, password }: SignInInput): Promise<SignInOutput> {
   await enableMocking();
 
@@ -82,17 +83,19 @@ export async function signIn({ username, password }: SignInInput): Promise<SignI
   }
 }
 
+/** 本物の signOut() の代わり。通信の成否によらず手元のトークンを捨てる。 */
 export async function signOut(): Promise<void> {
   await enableMocking();
 
   try {
     await apiClient.post("/auth/signout");
   } finally {
-    // 通信が失敗しても手元のトークンは必ず捨てます。
+    // 通信が失敗しても手元のトークンは必ず捨てる。
     clearTokens();
   }
 }
 
+/** 本物の getCurrentUser() の代わり。未ログインなら AuthError を投げる。 */
 export async function getCurrentUser(): Promise<AuthUser> {
   const stored = readTokens();
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { useAuthSession, useCurrentUser } from "@/hooks/use-auth-session";
 
+/** 認証状態の実験。ページ単位のキャッシュが効いていることを画面で確かめる。 */
 export function SessionLab() {
   return (
     <div className="space-y-12">
@@ -14,6 +15,7 @@ export function SessionLab() {
   );
 }
 
+/** いま保持している認証状態と、取り直しの操作。 */
 function SessionSummary() {
   const { session, isLoading, error, isSignedIn, refresh } = useAuthSession();
 
@@ -39,7 +41,7 @@ function SessionSummary() {
         <button
           type="button"
           onClick={() => void refresh()}
-          // 取得中に押せると 2 本が重なり、先に始めた方が後から着いて上書きし得ます。
+          // 取得中に押せると 2 本が重なり、先に始めた方が後から着いて上書きし得る。
           disabled={isLoading}
           className="text-sm text-brass hover:underline disabled:opacity-50"
         >
@@ -81,6 +83,7 @@ function SessionSummary() {
   );
 }
 
+/** 各階層が親から何も受け取らずに、同じ取得結果を得ていることの実演。 */
 function NestedDemo() {
   return (
     <section>
@@ -103,6 +106,7 @@ function NestedDemo() {
   );
 }
 
+/** 入れ子の 1 階層。自分で useAuthSession() を呼んで表示する。 */
 function Depth({ label, children }: { label: string; children: ReactNode }) {
   const { session, isLoading, isSignedIn } = useAuthSession();
 
@@ -118,6 +122,7 @@ function Depth({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+/** 最深部。useAuthSession() を内側で呼ぶ別のフックを経由する。 */
 function LeafViaNestedHook() {
   const { user, isLoading } = useCurrentUser();
 
@@ -132,6 +137,7 @@ function LeafViaNestedHook() {
   );
 }
 
+/** 取得が終わったあとに呼び出し側を増やしても、通信が増えないことの実演。 */
 function LateMountDemo() {
   const [count, setCount] = useState(0);
 
@@ -170,10 +176,11 @@ function LateMountDemo() {
   );
 }
 
+/** あとから現れた呼び出し側。マウント時点で取得済みかを記録する。 */
 function LateConsumer({ index }: { index: number }) {
   const { session, isLoading, isSignedIn } = useAuthSession();
 
-  // 最初の描画の時点で取得済みだったかどうかを、そのまま残します。
+  // 最初の描画の時点で取得済みだったかどうかを、そのまま残す。
   const [wasReadyOnMount] = useState(!isLoading);
 
   return (
@@ -191,6 +198,7 @@ function LateConsumer({ index }: { index: number }) {
   );
 }
 
+/** 呼び出し元と、そこで得られた値の 1 行表示。 */
 function Readout({ label, source, value }: { label: string; source: string; value: string }) {
   return (
     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">

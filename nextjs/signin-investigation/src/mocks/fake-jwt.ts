@@ -1,9 +1,10 @@
 import type { CognitoJwtPayload } from "@/lib/amplify-mock/types";
 import type { MockUser } from "@/mocks/users";
 
-/** アクセストークンの寿命。期限切れの挙動を試せるよう短めにしてあります。 */
+/** アクセストークンの寿命。期限切れの挙動を試せるよう短くしてある。 */
 export const ACCESS_TOKEN_TTL_SECONDS = 5 * 60;
 
+/** オブジェクトを JWT の各部に使う base64url にする。 */
 function toBase64Url(value: object): string {
   const bytes = new TextEncoder().encode(JSON.stringify(value));
   const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
@@ -11,12 +12,13 @@ function toBase64Url(value: object): string {
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-/** 署名しない偽の JWT。形だけ本物に似せてあります。 */
+/** 署名しない偽の JWT。形だけ本物に似せてある。 */
 export function signFakeJwt(payload: CognitoJwtPayload): string {
   const header = { alg: "none", typ: "JWT", kid: "mock" };
   return `${toBase64Url(header)}.${toBase64Url(payload)}.mock-signature`;
 }
 
+/** そのユーザー向けのアクセストークンと ID トークンを発行する。 */
 export function issueTokens(user: MockUser, now = Date.now()) {
   const issuedAt = Math.floor(now / 1000);
   const expiresAt = issuedAt + ACCESS_TOKEN_TTL_SECONDS;
