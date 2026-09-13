@@ -10,7 +10,6 @@ import {
   type SignInOutput,
 } from "@/lib/amplify-mock/types";
 import { enableMocking } from "@/mocks/enable-mocking";
-import { countFetchAuthSession } from "@/stores/auth-probe-store";
 import axios from "axios";
 
 type SessionResponse = {
@@ -29,15 +28,12 @@ type SignInResponse = {
 /**
  * 本物の fetchAuthSession() の代わり。
  *
- * 本物は有効なトークンが手元にあれば通信しませんが、こちらは実験の様子を
- * Network タブで数えられるよう、呼ばれるたびに必ず 1 往復します。
- * つまり「通信回数 = fetchAuthSession() が実際に走った回数」です。
+ * 本物は有効なトークンが手元にあれば通信しませんが、こちらは呼ばれるたびに
+ * 必ず 1 往復します。DevTools の Network で呼び出し回数を数えられるようにするためです。
  */
 export async function fetchAuthSession(
   options: FetchAuthSessionOptions = {},
 ): Promise<AuthSession> {
-  countFetchAuthSession();
-
   // モック専用。本物に差し替えるときはこの行ごと消えます。
   await enableMocking();
 

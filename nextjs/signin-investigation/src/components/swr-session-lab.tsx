@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuthSession } from "@/hooks/use-auth-session";
 import { useSwrAuthSession, useSwrAuthSessionByPath } from "@/hooks/use-swr-auth-session";
 import { SwrBoundaryDemo } from "@/components/swr-boundary-demo";
@@ -18,8 +18,6 @@ export function SwrSessionLab() {
 
   return (
     <div className="space-y-10">
-      <RequestCounter />
-
       {shows("a") && <ByPathPanel />}
 
       {/* SWR 版は、ページごとに作り直されるキャッシュの内側でのみ成立します。 */}
@@ -36,112 +34,44 @@ export function SwrSessionLab() {
   );
 }
 
-/** このページに来てからの /api/auth/session の通信回数。 */
-function RequestCounter() {
-  const [baseline] = useState(() => countSessionRequests());
-  const [current, setCurrent] = useState(baseline);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrent(countSessionRequests()), 400);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <p className="border border-brass bg-brass/10 px-5 py-3 font-mono text-sm">
-      このページでの /api/auth/session 通信回数: {current - baseline}
-    </p>
-  );
-}
-
-function countSessionRequests(): number {
-  if (typeof performance === "undefined") return 0;
-
-  return performance
-    .getEntriesByType("resource")
-    .filter((entry) => entry.name.includes("/api/auth/session")).length;
-}
-
 function ByPathPanel() {
   return (
     <Panel
       title="版A：キャッシュキーにパスを含める"
       note='useSWR(["auth/session", pathname])。キャッシュは SWR の global に残ります。'
       result={useSwrAuthSessionByPath()}
-      imperative={null}
     />
   );
 }
 
 function SwrPanel() {
-  const result = useSwrAuthSession();
-  const imperative = useImperativeProbe(result);
-
   return (
     <Panel
       title="版B：SWR ＋ ページごとの新しいキャッシュ"
       note="SWRConfig の provider を差し替え、key={pathname} で作り直します。"
-      result={result}
-      imperative={imperative}
+      result={useSwrAuthSession()}
     />
   );
 }
 
 function OwnPanel() {
-  const result = useAuthSession();
-  const imperative = useImperativeProbe(result);
-
   return (
     <Panel
       title="Context 版（現行）"
       note="Context + useRef の Promise。ページのマウント単位で破棄されます。"
-      result={result}
-      imperative={imperative}
+      result={useAuthSession()}
     />
   );
-}
-
-/**
- * マウント直後に useEffect から getAuthSession() を呼び、
- * 余計な通信が増えないかを見ます。
- */
-function useImperativeProbe(result: AuthSessionResult): string {
-  const { getAuthSession } = result;
-  const [outcome, setOutcome] = useState("待機中");
-
-  useEffect(() => {
-    let active = true;
-    const before = countSessionRequests();
-
-    getAuthSession()
-      .then((session) => {
-        if (!active) return;
-        const added = countSessionRequests() - before;
-        setOutcome(
-          `${session.tokens ? "ログイン済み" : "未ログイン"} / この取得で増えた通信 ${added} 件`,
-        );
-      })
-      .catch(() => {
-        if (active) setOutcome("取得に失敗");
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [getAuthSession]);
-
-  return outcome;
 }
 
 function Panel({
   title,
   note,
   result,
-  imperative,
 }: {
   title: string;
   note: string;
   result: AuthSessionResult;
-  imperative: string | null;
 }) {
   const { session, isLoading, isRefreshing } = result;
 
@@ -165,9 +95,6 @@ function Panel({
       term: "いまのログイン状態",
       value: session === null ? "—" : session.tokens ? "ログイン済み" : "未ログイン",
     },
-    ...(imperative
-      ? [{ term: "useEffect 内の getAuthSession()", value: imperative }]
-      : []),
   ];
 
   const showsStale = !firstRender.isLoading && firstRender.hasData && !firstRender.signedIn;

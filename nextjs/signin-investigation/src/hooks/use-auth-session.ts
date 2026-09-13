@@ -1,8 +1,7 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { AuthSessionContext } from "@/providers/auth-session-provider";
-import { registerConsumer } from "@/stores/auth-probe-store";
 import type { AuthSessionResult } from "@/types/auth-session-result";
 
 /**
@@ -20,9 +19,6 @@ export function useAuthSession(): AuthSessionResult {
   }
 
   const { session, error, isFetching, getAuthSession, refresh } = context;
-
-  // 計測用。実験の可視化以外に意味はありません。
-  useEffect(() => registerConsumer(), []);
 
   return {
     session,

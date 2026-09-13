@@ -5,9 +5,7 @@ import { useCallback } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { fetchAuthSession } from "@/lib/amplify-mock/auth";
 import type { AuthSession } from "@/lib/amplify-mock/types";
-import { registerConsumer } from "@/stores/auth-probe-store";
 import type { AuthSessionResult } from "@/types/auth-session-result";
-import { useEffect } from "react";
 
 const SESSION_KEY = "auth/session";
 
@@ -25,8 +23,6 @@ export function useSwrAuthSession(): AuthSessionResult {
     () => fetchAuthSession(),
     { keepPreviousData: false, revalidateOnFocus: false },
   );
-
-  useEffect(() => registerConsumer(), []);
 
   /**
    * 命令的な取得。SWR には「進行中の取得に相乗りする」公開 API が無いため、

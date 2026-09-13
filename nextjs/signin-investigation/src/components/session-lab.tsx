@@ -2,69 +2,21 @@
 
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
-import { useAuthBadge } from "@/hooks/use-auth-effect-demo";
 import { useAuthSession, useCurrentUser } from "@/hooks/use-auth-session";
-import { resetAuthCounters, useAuthProbeStore } from "@/stores/auth-probe-store";
 
 export function SessionLab() {
-  // このページの計測をここから数え直します。
-  // 描画の段階で走るので、取得を始める Provider の effect より先です。
-  useState(() => {
-    resetAuthCounters();
-    return null;
-  });
-
   return (
     <div className="space-y-12">
-      <ProbePanel />
       <SessionSummary />
       <NestedDemo />
-      <EffectDemo />
       <LateMountDemo />
     </div>
   );
 }
 
-/** 実験の計測値。ページをマウントし直すたびに 0 に戻ります。 */
-function ProbePanel() {
-  const consumers = useAuthProbeStore((state) => state.consumers);
-  const fetchCalls = useAuthProbeStore((state) => state.fetchCalls);
-
-  const rows = [
-    { term: "useAuthSession() を呼んでいる箇所", value: consumers, note: "マウント中の数" },
-    { term: "fetchAuthSession() の実行回数", value: fetchCalls, note: "= 通信回数" },
-  ];
-
-  return (
-    <section className="blueprint-grid bg-blueprint text-paper">
-      <div className="p-7 sm:p-9">
-        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-brass">Measurements</p>
-
-        <dl className="mt-7 grid gap-px border border-paper/15 bg-paper/15 sm:grid-cols-2">
-          {rows.map((row) => (
-            <div key={row.term} className="bg-blueprint px-5 py-5">
-              <dt className="text-xs leading-relaxed text-paper/60">{row.term}</dt>
-              <dd className="mt-3 flex items-baseline gap-2">
-                <span className="font-mono text-3xl">{row.value}</span>
-                <span className="font-mono text-[10px] uppercase tracking-widest text-paper/45">
-                  {row.note}
-                </span>
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        <p className="mt-7 max-w-2xl text-sm leading-relaxed text-paper/70">
-          左の数字がいくつであっても、右は 1 のままです。呼び出し側が増えても取得は増えません。
-        </p>
-      </div>
-    </section>
-  );
-}
-
 /** ページ直下からの呼び出し。 */
 function SessionSummary() {
-  const { session, isLoading, error, isSignedIn, refresh } = useAuthSession();
+  const { session, isLoading, isRefreshing, error, isSignedIn, refresh } = useAuthSession();
 
   const accessToken = session?.tokens?.accessToken;
   const expiresAt = accessToken
@@ -72,7 +24,10 @@ function SessionSummary() {
     : null;
 
   const rows: { term: string; value: ReactNode }[] = [
-    { term: "状態", value: isLoading ? "取得中" : isSignedIn ? "ログイン済み" : "未ログイン" },
+    {
+      term: "状態",
+      value: isLoading ? "取得中" : isSignedIn ? "ログイン済み" : "未ログイン",
+    },
     { term: "userSub", value: session?.userSub ?? "—" },
     { term: "identityId", value: session?.identityId ?? "—" },
     { term: "アクセストークン期限", value: expiresAt ?? "—" },
@@ -82,8 +37,13 @@ function SessionSummary() {
     <section>
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">いまの認証状態</h2>
-        <button type="button" onClick={() => void refresh()} className="text-sm text-brass hover:underline">
-          キャッシュを捨てて取り直す
+        <button
+          type="button"
+          onClick={() => void refresh()}
+          disabled={isRefreshing}
+          className="text-sm text-brass hover:underline disabled:opacity-50"
+        >
+          {isRefreshing ? "取り直しています" : "キャッシュを捨てて取り直す"}
         </button>
       </div>
 
@@ -177,65 +137,6 @@ function LeafViaNestedHook() {
 }
 
 /**
- * 3 段ネストしたカスタムフックの最深部で、useEffect から認証状態を使う実演。
- * コンポーネントは useAuthBadge() を呼ぶだけで、props は渡していません。
- */
-function EffectDemo() {
-  const { settled, awaited } = useAuthBadge();
-
-  const rows = [
-    {
-      label: "宣言的",
-      source: "useEffect が isLoading を見る",
-      log: settled,
-    },
-    {
-      label: "命令的",
-      source: "useEffect の中で await getAuthSession()",
-      log: awaited,
-    },
-  ];
-
-  return (
-    <section>
-      <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
-        ネストしたフックの useEffect から
-      </h2>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-graphite">
-        useAuthBadge() → useAuthAudit() → 最深部のフック、と 3 段重なっています。
-        useAuthSession() はフックなので各フックの先頭で呼び、useEffect
-        の中ではその結果、または getAuthSession() を使います。
-      </p>
-
-      <ul className="mt-6 space-y-2">
-        {rows.map((row) => (
-          <li
-            key={row.label}
-            className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border border-rule p-4"
-          >
-            <div>
-              <p className="text-sm font-semibold">{row.label}</p>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-brass">
-                {row.source}
-              </p>
-            </div>
-            <p className="break-all text-right font-mono text-xs text-graphite">
-              <span className="text-ink">effect {row.log.runs} 回</span>
-              {row.log.entries.length > 0 && (
-                <>
-                  <br />
-                  {row.log.entries.join(" / ")}
-                </>
-              )}
-            </p>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-/**
  * 取得が終わったあとに現れる呼び出し側。
  * 通信は起きず、最初の描画からすでに認証状態を持っています。
  */
@@ -256,9 +157,8 @@ function LateMountDemo() {
       </div>
 
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-graphite">
-        取得が終わったあとに増やしても、通信は増えません。上の
-        「fetchAuthSession() の実行回数」が 1 のままであることと、
-        追加された行が最初から取得済みであることを見てください。
+        取得が終わったあとに増やしても、通信は増えません。追加された行が
+        最初の描画から取得済みであることと、DevTools の Network が動かないことを見てください。
       </p>
 
       {count === 0 ? (
