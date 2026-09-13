@@ -73,7 +73,7 @@ function Panel({
   note: string;
   result: AuthSessionResult;
 }) {
-  const { session, isLoading, isRefreshing } = result;
+  const { session, isLoading } = result;
 
   // このコンポーネントが最初に描画された瞬間の値を、そのまま残します。
   const [firstRender] = useState(() => ({
@@ -90,7 +90,6 @@ function Panel({
       value: firstRender.hasData ? (firstRender.signedIn ? "ログイン済み" : "未ログイン") : "—",
     },
     { term: "いまの isLoading", value: String(isLoading) },
-    { term: "いまの isRefreshing", value: String(isRefreshing) },
     {
       term: "いまのログイン状態",
       value: session === null ? "—" : session.tokens ? "ログイン済み" : "未ログイン",

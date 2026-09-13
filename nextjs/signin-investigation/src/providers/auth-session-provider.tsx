@@ -18,18 +18,18 @@ export const AuthSessionContext = createContext<AuthSessionResult | null>(null);
 type State = {
   session: AuthSession | null;
   error: unknown;
-  isFetching: boolean;
+  isLoading: boolean;
 };
 
 // マウントした時点で取りにいくので、最初から取得中です。
-const initialState: State = { session: null, error: null, isFetching: true };
+const initialState: State = { session: null, error: null, isLoading: true };
 
 /** 成否をまとめて State に畳みます。返る Promise は reject しません。 */
 async function settle(promise: Promise<AuthSession>): Promise<State> {
   try {
-    return { session: await promise, error: null, isFetching: false };
+    return { session: await promise, error: null, isLoading: false };
   } catch (error) {
-    return { session: null, error, isFetching: false };
+    return { session: null, error, isLoading: false };
   }
 }
 
@@ -44,14 +44,14 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
 }
 
 function PageAuthSession({ children }: { children: ReactNode }) {
-  const [{ session, error, isFetching }, setState] = useState(initialState);
+  const [{ session, error, isLoading }, setState] = useState(initialState);
 
   useEffect(() => {
     settle(fetchAuthSession()).then(setState);
   }, []);
 
   const refresh = useCallback(async () => {
-    setState((current) => ({ ...current, isFetching: true }));
+    setState((current) => ({ ...current, isLoading: true }));
 
     setState(await settle(fetchAuthSession()));
   }, []);
@@ -60,12 +60,11 @@ function PageAuthSession({ children }: { children: ReactNode }) {
     () => ({
       session,
       error,
-      isLoading: isFetching && session === null,
-      isRefreshing: isFetching && session !== null,
+      isLoading,
       isSignedIn: Boolean(session?.tokens),
       refresh,
     }),
-    [session, error, isFetching, refresh],
+    [session, error, isLoading, refresh],
   );
 
   return <AuthSessionContext.Provider value={value}>{children}</AuthSessionContext.Provider>;

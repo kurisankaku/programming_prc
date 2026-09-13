@@ -14,7 +14,7 @@ const SESSION_KEY = "auth/session";
  * PageScopedSwrCache とセットで使います。
  */
 export function useSwrAuthSession(): AuthSessionResult {
-  const { data, isLoading, isValidating, error, mutate } = useSWR<AuthSession>(
+  const { data, isLoading, error, mutate } = useSWR<AuthSession>(
     SESSION_KEY,
     () => fetchAuthSession(),
     { keepPreviousData: false, revalidateOnFocus: false },
@@ -27,7 +27,6 @@ export function useSwrAuthSession(): AuthSessionResult {
   return {
     session: data ?? null,
     isLoading,
-    isRefreshing: isValidating && data !== undefined,
     error,
     isSignedIn: Boolean(data?.tokens),
     refresh,
@@ -38,7 +37,7 @@ export function useSwrAuthSession(): AuthSessionResult {
 export function useSwrAuthSessionByPath(): AuthSessionResult {
   const pathname = usePathname();
 
-  const { data, isLoading, isValidating, error, mutate } = useSWR<AuthSession>(
+  const { data, isLoading, error, mutate } = useSWR<AuthSession>(
     [SESSION_KEY, pathname],
     () => fetchAuthSession(),
     { keepPreviousData: false, revalidateOnFocus: false },
@@ -51,7 +50,6 @@ export function useSwrAuthSessionByPath(): AuthSessionResult {
   return {
     session: data ?? null,
     isLoading,
-    isRefreshing: isValidating && data !== undefined,
     error,
     isSignedIn: Boolean(data?.tokens),
     refresh,

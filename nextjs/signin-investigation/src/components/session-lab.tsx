@@ -15,7 +15,7 @@ export function SessionLab() {
 }
 
 function SessionSummary() {
-  const { session, isLoading, isRefreshing, error, isSignedIn, refresh } = useAuthSession();
+  const { session, isLoading, error, isSignedIn, refresh } = useAuthSession();
 
   const accessToken = session?.tokens?.accessToken;
   const expiresAt = accessToken
@@ -40,10 +40,10 @@ function SessionSummary() {
           type="button"
           onClick={() => void refresh()}
           // 取得中に押せると 2 本が重なり、先に始めた方が後から着いて上書きし得ます。
-          disabled={isLoading || isRefreshing}
+          disabled={isLoading}
           className="text-sm text-brass hover:underline disabled:opacity-50"
         >
-          {isRefreshing ? "取り直しています" : "キャッシュを捨てて取り直す"}
+          {isLoading ? "取得中" : "キャッシュを捨てて取り直す"}
         </button>
       </div>
 

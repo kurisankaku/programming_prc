@@ -3,10 +3,8 @@ import type { AuthSession } from "@/lib/amplify-mock/types";
 /** 認証状態を返すフックの共通シグネチャ。 */
 export type AuthSessionResult = {
   session: AuthSession | null;
-  /** まだ結果が無いときだけ true。 */
+  /** 取得中のあいだ true。初回も取り直しも同じです。 */
   isLoading: boolean;
-  /** 結果はあるが、裏で取り直しているとき true。 */
-  isRefreshing: boolean;
   error: unknown;
   isSignedIn: boolean;
   /** キャッシュを捨てて取り直します。 */
