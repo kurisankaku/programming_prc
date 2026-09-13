@@ -19,18 +19,16 @@ export function useAuthSession(): AuthSessionResult {
     throw new Error("useAuthSession は AuthSessionProvider の内側で呼んでください。");
   }
 
-  const { status, session, error, load, getAuthSession, refresh } = context;
+  const { session, error, isFetching, getAuthSession, refresh } = context;
 
-  useEffect(() => {
-    void load();
-    return registerConsumer();
-  }, [load]);
+  // 計測用。実験の可視化以外に意味はありません。
+  useEffect(() => registerConsumer(), []);
 
   return {
     session,
     // 手元に結果が無いときだけ true。取り直し中は isRefreshing で表します。
-    isLoading: session === null && status !== "error",
-    isRefreshing: session !== null && status === "loading",
+    isLoading: isFetching && session === null,
+    isRefreshing: isFetching && session !== null,
     error,
     isSignedIn: Boolean(session?.tokens),
     getAuthSession,

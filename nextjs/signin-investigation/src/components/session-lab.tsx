@@ -4,9 +4,16 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { useAuthBadge } from "@/hooks/use-auth-effect-demo";
 import { useAuthSession, useCurrentUser } from "@/hooks/use-auth-session";
-import { useAuthProbeStore } from "@/stores/auth-probe-store";
+import { resetAuthCounters, useAuthProbeStore } from "@/stores/auth-probe-store";
 
 export function SessionLab() {
+  // このページの計測をここから数え直します。
+  // 描画の段階で走るので、取得を始める Provider の effect より先です。
+  useState(() => {
+    resetAuthCounters();
+    return null;
+  });
+
   return (
     <div className="space-y-12">
       <ProbePanel />
@@ -21,12 +28,10 @@ export function SessionLab() {
 /** 実験の計測値。ページをマウントし直すたびに 0 に戻ります。 */
 function ProbePanel() {
   const consumers = useAuthProbeStore((state) => state.consumers);
-  const loads = useAuthProbeStore((state) => state.loads);
   const fetchCalls = useAuthProbeStore((state) => state.fetchCalls);
 
   const rows = [
     { term: "useAuthSession() を呼んでいる箇所", value: consumers, note: "マウント中の数" },
-    { term: "取得を開始した回数", value: loads, note: "ページごとに 1" },
     { term: "fetchAuthSession() の実行回数", value: fetchCalls, note: "= 通信回数" },
   ];
 
@@ -35,7 +40,7 @@ function ProbePanel() {
       <div className="p-7 sm:p-9">
         <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-brass">Measurements</p>
 
-        <dl className="mt-7 grid gap-px border border-paper/15 bg-paper/15 sm:grid-cols-3">
+        <dl className="mt-7 grid gap-px border border-paper/15 bg-paper/15 sm:grid-cols-2">
           {rows.map((row) => (
             <div key={row.term} className="bg-blueprint px-5 py-5">
               <dt className="text-xs leading-relaxed text-paper/60">{row.term}</dt>
@@ -50,7 +55,7 @@ function ProbePanel() {
         </dl>
 
         <p className="mt-7 max-w-2xl text-sm leading-relaxed text-paper/70">
-          左の数字がいくつであっても、右の二つは 1 のままです。呼び出し側が増えても取得は増えません。
+          左の数字がいくつであっても、右は 1 のままです。呼び出し側が増えても取得は増えません。
         </p>
       </div>
     </section>

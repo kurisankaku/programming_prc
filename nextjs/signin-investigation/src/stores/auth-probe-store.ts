@@ -15,8 +15,6 @@ export const emptyEffectLog: EffectLog = { runs: 0, entries: [] };
 type AuthProbeState = {
   /** useAuthSession() を呼んでいる、いまマウント中の箇所の数。 */
   consumers: number;
-  /** このページで取得を開始した回数。読み込み直後は 1 になるはずです。 */
-  loads: number;
   /** モック fetchAuthSession() が実際に走った回数。 */
   fetchCalls: number;
   /** ネストしたフックの useEffect が、いつ何を見たか。 */
@@ -25,7 +23,6 @@ type AuthProbeState = {
 
 export const useAuthProbeStore = create<AuthProbeState>()(() => ({
   consumers: 0,
-  loads: 0,
   fetchCalls: 0,
   effectLogs: {},
 }));
@@ -35,7 +32,7 @@ export const useAuthProbeStore = create<AuthProbeState>()(() => ({
  * consumers は登録と解除で常に正しい値になるので、ここでは触りません。
  */
 export function resetAuthCounters(): void {
-  useAuthProbeStore.setState({ loads: 0, fetchCalls: 0, effectLogs: {} });
+  useAuthProbeStore.setState({ fetchCalls: 0, effectLogs: {} });
 }
 
 /** ネストしたフックの effect が走ったことを記録します。 */
@@ -50,10 +47,6 @@ export function recordEffectRun(key: string, entry: string): void {
       },
     };
   });
-}
-
-export function countLoad(): void {
-  useAuthProbeStore.setState((state) => ({ loads: state.loads + 1 }));
 }
 
 export function countFetchAuthSession(): void {
