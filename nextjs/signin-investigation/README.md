@@ -1,7 +1,9 @@
-# 工具 Kōgu — Next.js サンプル SPA
+# 工具 Kōgu — Next.js の認証状態キャッシュ検証
 
-Next.js の App Router 標準構成で作った 3 ページのサンプルです。
-架空の道具屋のカタログサイトを題材に、zustand / SWR / axios / MSW を組み合わせています。
+`fetchAuthSession()` を**どこから何回呼んでも困らない**形にするための検証プロジェクト。
+架空の道具屋のカタログサイトを題材に、zustand / SWR / axios / MSW を組み合わせている。
+
+実サーバーは無く、通信はすべて MSW が受ける。Cognito も自前のモックで置き換えてある。
 
 ## 構成
 
@@ -17,50 +19,25 @@ Next.js の App Router 標準構成で作った 3 ページのサンプルです
 | MSW | 2 系（devDependency） | モックの通信 |
 | モック Amplify | 自前 | Cognito の代わり（`src/lib/amplify-mock`） |
 
-`next.config.ts` は空のままで、`create-next-app` の既定構成から変えていません。
+`next.config.ts` は空のままで、`create-next-app` の既定構成から変えていない。
 
-## データの流れ
+## 主題：認証状態をページ単位でキャッシュする
 
-```
-ProductList（Client Component）
-  └─ zustand ─ 絞り込み条件（検索語・分類・在庫）
-       └─ SWR キー "/products?q=…&category=…"
-            └─ fetcher ─ axios（baseURL: /api）
-                 └─ GET /api/products
-                      └─ MSW がブラウザで受けて応答（実サーバーなし）
-```
+要件は 2 つの寿命の混在。
 
-- **絞り込みはサーバー側（= MSW ハンドラ）で行います。** 条件がそのまま SWR のキーになるので、
-  一度見た条件に戻ればキャッシュから即座に描画され、再取得は裏で走ります。
-- 検索語は 250ms デバウンスしてからキーに反映します（1 文字ごとに取得が走りません）。
-- `keepPreviousData` を有効にしているため、条件を変えても前の結果を薄く残したまま更新します。
-  骨組み（スケルトン）が出るのは、まだ一度も結果が無い初回だけです。
-- トップページの「今月の道具」はあえてサーバー側描画のままにしてあります。
-  すべてをクライアント取得にする必要はない、という対比です。
+| 取得するもの | 載せる先 | 寿命 |
+| --- | --- | --- |
+| 商品一覧・お知らせなど | SWR（グローバル） | ページをまたいで保持 |
+| **ログイン状態** | **Context（`AuthSessionProvider`）** | **そのページを離れるまで** |
 
-## モック通信について
-
-このサンプルには実サーバーがないので、`/api/products` は MSW が受けます。
-
-- 有効・無効は `.env` の `NEXT_PUBLIC_API_MOCKING` で切り替えます（既定は `enabled`）。
-- ブラウザ側のみのモックです。Service Worker の起動を待ってから最初の取得を行うため、
-  `useMocksReady()` が `true` になるまで SWR のキーは `null` にしています。
-- `public/mockServiceWorker.js` は `npx msw init public/ --save` が生成したものです。手で編集しません。
-
-> **本物の API に繋いだら** `NEXT_PUBLIC_API_MOCKING=disabled` にして、`src/mocks/` と
-> `src/data/products.ts` を外してください。有効なまま公開すると、本番でもモックが応答します。
-
-## 認証状態の扱い（このプロジェクトの主題）
-
-`fetchAuthSession()` を**どこから何回呼んでも困らない**形にするための実験です。
-呼び出し回数を減らすのではなく、**ページ単位で Promise を 1 つだけ共有**して解決しています。
+単一のキャッシュ機構では分離できないため、認証だけ SWR から外している。理由は後述。
 
 ```
 どのコンポーネント・どのフックからでも
   useAuthSession()  →  { session, isLoading, error, isSignedIn, refresh }
-       └─ AuthSessionProvider（ページのマウント単位で生存）
-            └─ useRef に保持した Promise ← 2 人目以降は同じものに相乗り
-                 └─ fetchAuthSession()  ← モック Amplify
+       └─ AuthSessionContext（読むだけ。取得はしない）
+            └─ PageAuthSession（key={pathname} でページごとに作り直される）
+                 └─ マウント時に 1 回だけ fetchAuthSession()
                       └─ axios GET /api/auth/session
                            └─ MSW
 ```
@@ -70,73 +47,104 @@ ProductList（Client Component）
 | 性質 | 仕組み |
 | --- | --- |
 | 親から props で引き継がなくてよい | 状態は Context 経由。ネストの深さは無関係 |
-| 同時に何箇所から呼ばれても通信は 1 回 | `pending` の Promise に相乗りする |
-| 取得後に増えた呼び出し側は通信ゼロ | 解決済みの Promise がそのまま返る |
-| ページを離れると破棄される | Promise は `useRef` にあり、アンマウントで消える |
+| 呼び出し側が何箇所あっても通信は 1 回 | 取得するのは Provider だけ。呼び出し側は Context を読む |
+| 取得後に増えた呼び出し側は通信ゼロ | すでに Context に結果がある |
+| ページを離れると破棄される | `key={pathname}` で `PageAuthSession` ごと作り直される |
 
-`AuthSessionProvider` は共通レイアウトに置き、内部で `key={pathname}` を付けています。
-パスが変わると境界ごと作り直されるため、キャッシュの寿命は「そのページがマウントされている間」です。
+`AuthSessionProvider` は共通レイアウトに置き、ヘッダーも含めて囲んでいる。
+`key` を渡すために `AuthSessionProvider`（パスを読む）と `PageAuthSession`（状態を持つ）に
+分かれている。`key` は自分自身には付けられないため、この分割は省けない。
 
-`/session` で実際の数値を確認できます。読み込み直後は
-**「呼んでいる箇所 6 / 取得開始 1 / fetchAuthSession() 実行 1」**、
-「呼び出し箇所を増やす」で 9 まで増やしても後ろ二つは 1 のままです。
+### 開発時は通信が 2 回になる
+
+React StrictMode が effect を 2 回走らせるため、開発ビルドではマウント時の取得が 2 回飛ぶ。
+本番ビルドでは 1 回。**開発時だけ効くガードは意図的に置いていない**（本番で実行されない
+コードを残さない方針）。
 
 ### ネストしたカスタムフックから使う
 
-`useAuthSession()` は**フック**です。`useEffect` の中では呼べません（フックのルール違反）。
-フック本体の先頭で呼び、useEffect ではその結果を使ってください。
+`useAuthSession()` は**フック**なので `useEffect` の中では呼べない。
+フック本体の先頭で呼び、`useEffect` ではその結果を使う。
 
 ```ts
 function useMyHook() {
   const { session, isLoading, isSignedIn } = useAuthSession(); // ← ここで呼ぶ
 
   useEffect(() => {
-    if (isLoading) return;        // 確定前は null なので待つ
+    if (isLoading) return; // 確定前は null
     doSomething(session);
   }, [isLoading, isSignedIn, session]);
 }
 ```
 
-useEffect やイベントハンドラの中で認証状態そのものが欲しい場合は、`getAuthSession()`
-を await します。取得済みなら通信は起きず、解決済みの Promise がそのまま返ります。
-
-```ts
-function useMyHook() {
-  const { getAuthSession } = useAuthSession();
-
-  useEffect(() => {
-    let active = true;
-    getAuthSession().then((session) => {
-      if (active) doSomething(session);
-    });
-    return () => { active = false; };
-  }, [getAuthSession]);           // 参照は不変なので繰り返し走りません
-}
-```
-
-`/session` の「ネストしたフックの useEffect から」で、3 段ネスト（useAuthBadge →
-useAuthAudit → 最深部）の両パターンが動いていることを確認できます。
+`isLoading` は初回も取り直しも同じく `true` になる。取り直し中も `session` は消えないので、
+「値はあるが取得中」を区別したければ `session !== null && isLoading` で判定する。
 
 ### 副作用として受け入れていること
 
-ヘッダーも境界の内側にあるため、**ページを移動するたびにヘッダーの認証表示も一度「確認中」に戻ります**。
-ページ単位でキャッシュを捨てる以上は避けられない挙動です。ヘッダーだけ滑らかにしたい場合は、
-境界の外側に別の保持先（前回の結果を覚えておく層）が必要になります。
+ヘッダーも境界の内側にあるため、**ページを移動するたびにヘッダーの認証表示も一度
+「確認中」に戻る**。ページ単位でキャッシュを捨てる以上は避けられない。
+
+## なぜ SWR ではないのか
+
+`/swr-session` に 3 方式を並べて比較してある（`?only=a` / `?only=b` / `?only=own` で 1 つずつ計測できる）。
+
+| 方式 | 結果 |
+| --- | --- |
+| SWR・キーにパスを含める | **要件を満たさない**。未ログインで訪れたパスに戻ると、古い「未ログイン」を `isLoading: false` のまま描画する |
+| SWR・ページごとに新しいキャッシュ | 要件は満たす。ただし境界は React のサブツリー単位なので、認証を囲むと商品一覧も一緒にページ単位になる |
+| Context（採用） | 要件を満たし、他のキャッシュに影響しない |
+
+SWR のキャッシュ境界は `<SWRConfig value={{ provider: () => new Map() }}>` で作る。
+設定（fetcher など）は親からマージされるが、**キャッシュだけが別**になる。
+`/swr-session?only=boundary` で、同じキーが境界の内外で別物になることを確認できる。
+
+## 商品一覧のデータの流れ
+
+```
+ProductList（Client Component）
+  └─ zustand ─ 絞り込み条件（検索語・分類・在庫）
+       └─ SWR キー "/products?q=…&category=…"
+            └─ fetcher ─ axios（baseURL: /api）
+                 └─ GET /api/products
+                      └─ MSW がブラウザで受けて応答
+```
+
+- **絞り込みはサーバー側（= MSW ハンドラ）で行う。** 条件がそのまま SWR のキーになるので、
+  一度見た条件に戻ればキャッシュから即座に描画され、再取得は裏で走る。
+- 検索語は 250ms デバウンスしてからキーに反映する。
+- `keepPreviousData` を有効にしているため、条件を変えても前の結果を薄く残したまま更新する。
+  骨組み（スケルトン）が出るのは、まだ一度も結果が無い初回だけ。
+- トップページの「今月の道具」はあえてサーバー側描画のままにしてある。
+
+## モック通信
+
+実サーバーが無いので、`/api/*` はすべて MSW が受ける。
+
+- 有効・無効は `.env` の `NEXT_PUBLIC_API_MOCKING` で切り替える（既定は `enabled`）。
+- ブラウザ側のみのモック。Service Worker の起動を待ってから最初の取得を行うため、
+  `useMocksReady()` が `true` になるまで SWR のキーは `null` にしている。
+- `public/mockServiceWorker.js` は `npx msw init public/ --save` が生成したもの。手で編集しない。
+
+> **本物の API に繋いだら** `NEXT_PUBLIC_API_MOCKING=disabled` にして、`src/mocks/` と
+> `src/data/products.ts` を外す。有効なまま公開すると、本番でもモックが応答する。
 
 ### モック Amplify
 
-`src/lib/amplify-mock/` が `aws-amplify/auth` の代わりです。型と戻り値を本物に寄せてあります。
+`src/lib/amplify-mock/` が `aws-amplify/auth` の代わり。型と戻り値を本物に寄せてある。
 
-- `fetchAuthSession(options?)` — 未ログインでも例外にせず `tokens: undefined` を返します
+- `fetchAuthSession(options?)` — 未ログインでも例外にせず `tokens: undefined` を返す
 - `signIn({ username, password })` / `signOut()` / `getCurrentUser()`
-- トークンは署名のない偽 JWT。`localStorage` に置きます（本物と同じ保存先）
+- トークンは署名のない偽 JWT。`localStorage` に置く（本物と同じ保存先）
 
-> **本物との違い**：本物は有効なトークンが手元にあれば通信しませんが、こちらは実験を
-> Network タブで数えられるよう、呼ばれるたびに必ず 1 往復します。
-> つまり「通信回数 = fetchAuthSession() が実際に走った回数」です。
+> **本物との違い**：本物は有効なトークンが手元にあれば通信しないが、こちらは呼び出し回数を
+> Network タブで数えられるよう、呼ばれるたびに必ず 1 往復する。
 
 本物へ差し替えるときは `@/lib/amplify-mock/auth` を `aws-amplify/auth` に置き換え、
-`src/lib/amplify-mock/` と `src/mocks/` を外してください。Provider とフックは変更不要です。
+`src/lib/amplify-mock/` と `src/mocks/` を外す。Provider とフックは変更不要。
+
+`usePathname()` を使っているのは `AuthSessionProvider` の 1 行だけなので、
+Next.js App Router 以外へ持ち出す場合もそこだけ差し替えればよい。
 
 ### モックのアカウント
 
@@ -144,7 +152,6 @@ useAuthAudit → 最深部）の両パターンが動いていることを確認
 | --- | --- |
 | kogu@example.com | Passw0rd! |
 | guest@example.com | Guest123! |
-
 
 ## ページ
 
@@ -154,59 +161,67 @@ useAuthAudit → 最深部）の両パターンが動いていることを確認
 | `/products` | `src/app/products/page.tsx` | 一覧。検索・分類・在庫での絞り込み |
 | `/about` | `src/app/about/page.tsx` | 工房紹介と店舗案内 |
 | `/signin` | `src/app/signin/page.tsx` | モック Cognito へのログイン |
-| `/session` | `src/app/session/page.tsx` | 認証状態の実験と計測 |
+| `/session` | `src/app/session/page.tsx` | 認証状態の確認。入れ子と後発マウントの実演 |
+| `/swr-session` | `src/app/swr-session/page.tsx` | SWR 3 方式の比較 |
 | （404） | `src/app/not-found.tsx` | 見つからないページ |
 
 ## ディレクトリ
 
 ```
 src/
-├── app/
-│   ├── layout.tsx              # フォント・メタデータ・ヘッダー/フッター・SWR 設定
-│   ├── globals.css             # Tailwind v4 のテーマトークン
-│   ├── page.tsx / about / products / not-found
+├── app/                         # 上表のルート。layout.tsx に Provider を置く
 ├── components/
-│   ├── site-header.tsx         # "use client"（usePathname でアクティブ表示）
-│   ├── site-footer.tsx
-│   ├── product-card.tsx        # Server Component
-│   └── product-list.tsx        # "use client"（zustand + SWR）
+│   ├── site-header.tsx          # 現在地の下線と認証表示
+│   ├── header-auth.tsx          # ログイン導線 / ログアウト
+│   ├── product-card.tsx         # Server Component
+│   ├── product-list.tsx         # zustand + SWR
+│   ├── signin-form.tsx
+│   ├── session-lab.tsx          # /session の中身
+│   ├── swr-session-lab.tsx      # /swr-session の 3 方式比較
+│   └── swr-boundary-demo.tsx    # SWR のキャッシュ境界の確認
 ├── hooks/
-│   ├── use-auth-session.ts     # 認証状態の取得口（useCurrentUser も同居）
+│   ├── use-auth-session.ts      # 認証状態の取得口（useCurrentUser も同居）
+│   ├── use-swr-auth-session.ts  # 比較用の SWR 版
 │   ├── use-debounced-value.ts
-│   └── use-mocks-ready.ts      # Service Worker の起動待ち
+│   └── use-mocks-ready.ts       # Service Worker の起動待ち
 ├── lib/
-│   ├── amplify-mock/           # aws-amplify/auth の代役
-│   ├── api-client.ts           # axios インスタンスとエラーメッセージ変換
-│   └── fetcher.ts              # SWR の既定フェッチャー
+│   ├── amplify-mock/            # aws-amplify/auth の代役
+│   ├── api-client.ts            # axios インスタンスとエラーメッセージ変換
+│   └── fetcher.ts               # SWR の既定フェッチャー
 ├── mocks/
-│   ├── handlers/               # products / auth
-│   ├── users.ts                # モックのユーザープール
-│   ├── fake-jwt.ts             # 署名なし JWT の発行
-│   ├── browser.ts              # setupWorker
-│   └── enable-mocking.ts       # 起動は一度だけ
+│   ├── handlers/                # products / auth
+│   ├── users.ts                 # モックのユーザープール
+│   ├── fake-jwt.ts              # 署名なし JWT の発行
+│   ├── browser.ts               # setupWorker
+│   └── enable-mocking.ts        # 起動は一度だけ
 ├── providers/
-│   ├── auth-session-provider.tsx  # ページ単位のキャッシュ境界
-│   └── swr-provider.tsx        # SWRConfig（fetcher / keepPreviousData）
+│   ├── auth-session-provider.tsx  # ページ単位のキャッシュ境界と取得
+│   ├── swr-provider.tsx           # SWRConfig（fetcher / keepPreviousData）
+│   └── page-scoped-swr-cache.tsx  # 比較用。配下だけ独立したキャッシュ
 ├── stores/
-│   ├── auth-probe-store.ts     # 実験の計測（認証本体には無関係）
-│   └── product-filter-store.ts # zustand + SWR キーの組み立て
+│   └── product-filter-store.ts  # zustand + SWR キーの組み立て
 ├── types/
-│   └── product.ts              # 型・定数（アプリ側が参照するのはここ）
+│   ├── auth-session-result.ts   # useAuthSession が返す型
+│   └── product.ts
 └── data/
-    └── products.ts             # サンプルデータ（MSW と トップのみが読む）
+    └── products.ts              # サンプルデータ（MSW とトップのみが読む）
 ```
+
+認証まわりを別プロジェクトへ持ち出すなら、必要なのは
+`providers/auth-session-provider.tsx` / `hooks/use-auth-session.ts` /
+`types/auth-session-result.ts` の 3 つ。
 
 ## 開発
 
 ```bash
 npm run dev     # http://localhost:3000
-npm run build   # 本番ビルド（4 ルートすべて静的プリレンダリング）
+npm run build   # 本番ビルド（7 ルートすべて静的プリレンダリング）
 npm run lint
 ```
 
 ## デザイントークン
 
-色と書体は `src/app/globals.css` の `@theme` に集約しています。
+色と書体は `src/app/globals.css` の `@theme` に集約している。
 `paper` / `ink` / `graphite` / `rule` / `blueprint` / `brass` の 6 色と、
 本文用 Archivo（日本語は OS の標準ゴシックにフォールバック）、
-仕様表示用 IBM Plex Mono の 2 書体です。
+仕様表示用 IBM Plex Mono の 2 書体。
