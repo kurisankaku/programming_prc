@@ -47,10 +47,7 @@ export function usePageScopedSession(): AuthSessionResult {
 
   // マウントしたら取りにいきます。呼び出し側は待つだけで済みます。
   useEffect(() => {
-    // useEffect のコールバックは async にできない（戻り値はクリーンアップ関数）ので包みます。
-    void (async () => {
-      setState(await settle(getAuthSession()));
-    })();
+    settle(getAuthSession()).then(setState);
   }, [getAuthSession]);
 
   const refresh = useCallback(async () => {
