@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { createSessionLoader } from "@/lib/auth/session-loader";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { fetchAuthSession } from "@/lib/amplify-mock/auth";
 import type { AuthSession } from "@/lib/amplify-mock/types";
 import type { AuthSessionResult } from "@/types/auth-session-result";
 
@@ -16,20 +16,31 @@ const initialState: State = { session: null, error: null, isFetching: true };
 
 /**
  * 認証状態を、このフックが生きているあいだだけ保持します。
- * アンマウントすれば loader ごと消えるので、次のマウントでは取り直します。
+ * アンマウントすれば ref ごと消えるので、次のマウントでは取り直します。
  */
 export function usePageScopedSession(): AuthSessionResult {
-  const [loader] = useState(createSessionLoader);
   const [{ session, error, isFetching }, setState] = useState(initialState);
+
+  // このマウントで進行中、または解決済みの取得。
+  const pending = useRef<Promise<AuthSession> | null>(null);
+
+  /**
+   * 取得を 1 本に保ちます。2 人目以降は同じ Promise を受け取るので、
+   * 解決前なら相乗りし、解決済みなら待たずに値を受け取ります。
+   */
+  const getAuthSession = useCallback((): Promise<AuthSession> => {
+    pending.current ??= fetchAuthSession();
+    return pending.current;
+  }, []);
 
   /** 取得して、描画できる形に整えます。成功も失敗もここで State になります。 */
   const load = useCallback(
     (): Promise<State> =>
-      loader.load().then(
+      getAuthSession().then(
         (session) => ({ session, error: null, isFetching: false }),
         (error: unknown) => ({ session: null, error, isFetching: false }),
       ),
-    [loader],
+    [getAuthSession],
   );
 
   // マウントしたら取りにいきます。呼び出し側は待つだけで済みます。
@@ -38,11 +49,11 @@ export function usePageScopedSession(): AuthSessionResult {
   }, [load]);
 
   const refresh = useCallback(async () => {
-    loader.reset();
+    pending.current = null;
     setState((current) => ({ ...current, isFetching: true }));
 
     setState(await load());
-  }, [loader, load]);
+  }, [load]);
 
   return useMemo(
     () => ({
@@ -52,9 +63,9 @@ export function usePageScopedSession(): AuthSessionResult {
       isLoading: isFetching && session === null,
       isRefreshing: isFetching && session !== null,
       isSignedIn: Boolean(session?.tokens),
-      getAuthSession: loader.load,
+      getAuthSession,
       refresh,
     }),
-    [session, error, isFetching, loader, refresh],
+    [session, error, isFetching, getAuthSession, refresh],
   );
 }
