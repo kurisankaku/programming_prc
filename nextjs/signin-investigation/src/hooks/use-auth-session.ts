@@ -12,24 +12,13 @@ import type { AuthSessionResult } from "@/types/auth-session-result";
  * 実際の取得はページごとに一度だけで、2 人目以降はその結果を共有します。
  */
 export function useAuthSession(): AuthSessionResult {
-  const context = useContext(AuthSessionContext);
+  const value = useContext(AuthSessionContext);
 
-  if (!context) {
+  if (!value) {
     throw new Error("useAuthSession は AuthSessionProvider の内側で呼んでください。");
   }
 
-  const { session, error, isFetching, getAuthSession, refresh } = context;
-
-  return {
-    session,
-    // 手元に結果が無いときだけ true。取り直し中は isRefreshing で表します。
-    isLoading: isFetching && session === null,
-    isRefreshing: isFetching && session !== null,
-    error,
-    isSignedIn: Boolean(session?.tokens),
-    getAuthSession,
-    refresh,
-  };
+  return value;
 }
 
 /**
