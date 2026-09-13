@@ -8,7 +8,9 @@ import {
   useMemo,
   useRef,
   useState,
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
 } from "react";
 import { fetchAuthSession } from "@/lib/amplify-mock/auth";
 import type { AuthSession } from "@/lib/amplify-mock/types";
@@ -20,7 +22,7 @@ export type AuthSessionContextValue = {
   isFetching: boolean;
   /**
    * 認証状態を取ります。取得済みなら通信は起きず、
-   * 解決済みの Promise がそのまま返ります。
+   * 解決済みの Promise がそのまま返ります。失敗すれば reject します。
    */
   getAuthSession: () => Promise<AuthSession>;
   /** キャッシュを捨てて取り直します。ログイン直後などに使います。 */
@@ -51,6 +53,28 @@ type State = {
 // ページを開いた時点で取りにいくので、最初から取得中です。
 const initialState: State = { session: null, error: null, isFetching: true };
 
+/** 取得して結果を state に書きます。失敗も state に残したうえで投げ直します。 */
+async function fetchAndStore(
+  setState: Dispatch<SetStateAction<State>>,
+): Promise<AuthSession> {
+  try {
+    const session = await fetchAuthSession();
+    setState({ session, error: null, isFetching: false });
+    return session;
+  } catch (error) {
+    setState({ session: null, error, isFetching: false });
+    throw error;
+  }
+}
+
+/**
+ * 結果を使わない呼び出しのための受け皿。
+ *
+ * 失敗はすでに state に入っていて画面から読めるので、ここで受け取る必要はありません。
+ * ただし誰も受け取らないと未処理の rejection になるため、明示的に捨てています。
+ */
+const alreadyHandled = () => {};
+
 function PageAuthSession({ children }: { children: ReactNode }) {
   const [state, setState] = useState(initialState);
 
@@ -58,19 +82,10 @@ function PageAuthSession({ children }: { children: ReactNode }) {
   // ref なのでアンマウントと同時に消え、次のマウントでは必ず取り直します。
   const pending = useRef<Promise<AuthSession> | null>(null);
 
+  // await を挟まないのは、ここでやるのが「取得中の Promise を手渡す」ことだけだからです。
+  // 2 人目以降はその Promise に相乗りし、解決済みなら即座に受け取ります。
   const getAuthSession = useCallback((): Promise<AuthSession> => {
-    // 2 人目以降は、進行中の Promise にそのまま相乗りします。
-    // 解決済みならその Promise は即座に返るので、通信は起きません。
-    pending.current ??= fetchAuthSession()
-      .then((session) => {
-        setState({ session, error: null, isFetching: false });
-        return session;
-      })
-      .catch((error: unknown) => {
-        setState({ session: null, error, isFetching: false });
-        throw error;
-      });
-
+    pending.current ??= fetchAndStore(setState);
     return pending.current;
   }, []);
 
@@ -78,13 +93,12 @@ function PageAuthSession({ children }: { children: ReactNode }) {
     pending.current = null;
     setState((current) => ({ ...current, isFetching: true }));
 
-    // 失敗は state に入るので、ここでは投げ直しません。
-    await getAuthSession().catch(() => {});
+    await getAuthSession().catch(alreadyHandled);
   }, [getAuthSession]);
 
   // ページを開いたら取りにいきます。呼び出し側は待つだけで済みます。
   useEffect(() => {
-    void getAuthSession().catch(() => {});
+    void getAuthSession().catch(alreadyHandled);
   }, [getAuthSession]);
 
   const value = useMemo<AuthSessionContextValue>(
